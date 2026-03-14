@@ -1,4 +1,5 @@
-import dbConnect from "../config/dbconnect"
+import dbConnect from "../config/dbconnect";
+import { catchAsyncErrors } from "../config/middlewares/catchAsyncErrors";
 import User from "../models/user-model";
 export const register = async (
   name: string,
