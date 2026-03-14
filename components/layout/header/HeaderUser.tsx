@@ -8,28 +8,48 @@ import {
 import { User } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { IUser } from "@/backend/models/user-model";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 const HeaderUser = ({ user }: { user: IUser }) => {
-
-  
+  const { data } = useSession();
+  const provider = data?.provider;
 
   return (
     <div className="flex items-center gap-4">
       <Dropdown placement="bottom-start">
         <DropdownTrigger>
-          <User
-            as="button"
-            avatarProps={{
-              isBordered: true,
-              src: user?.profilePicture?.url
-                ? user?.profilePicture?.url
-                : "/images/default_user.png",
-            }}
-            className="transition-transform"
-            description={user?.email}
-            name={user?.name}
-          />
+          <button className="relative w-fit">
+            <User
+              as="div"
+              avatarProps={{
+                isBordered: true,
+                src: user?.profilePicture?.url
+                  ? user?.profilePicture?.url
+                  : "/images/default_user.png",
+              }}
+              className="transition-transform"
+              description={user?.email}
+              name={user?.name}
+            />
+            {/* ✅ Google badge */}
+            {provider === "google" && (
+              <span className="absolute bottom-4 left-4 bg-white rounded-full p-0.5 shadow-md z-10">
+                <Icon
+                  icon="flat-color-icons:google"
+                  className="text-base w-7 h-7"
+                />
+              </span>
+            )}
+            {/* ✅ GitHub badge */}
+            {provider === "github" && (
+              <span className="absolute bottom-4 left-4 bg-white rounded-full p-0.5 shadow-md z-10">
+                <Icon
+                  icon="mdi:github"
+                  className="text-base w-7 h-7 text-gray-900"
+                />
+              </span>
+            )}
+          </button>
         </DropdownTrigger>
         <DropdownMenu aria-label="User Actions" variant="flat">
           <DropdownItem key="profile" className="h-14 gap-2">
