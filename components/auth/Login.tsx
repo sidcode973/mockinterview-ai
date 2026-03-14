@@ -5,26 +5,50 @@ import { Button, Input, Link, Form, Divider } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { Logo } from "@/config/Logo";
 import { signIn } from "next-auth/react";
+import { useGenericSubmitHandler } from "../form/genericSubmitHandler";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [isVisible, setIsVisible] = React.useState(false);
+  const router = useRouter();
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
-  const submitHandler = async (e: React.SyntheticEvent<HTMLFormElement>) => {
-  e.preventDefault();
+  const { handleSubmit, loading } = useGenericSubmitHandler(async (data) => {
+    let res;
+    try {
+      res = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+        callbackUrl: "/app/dashboard",
+      });
+    } catch (err) {
+      throw err;
+    }
 
-    const res = await signIn("credentials", {
-      redirect: false,
-      email: e.currentTarget.email.value,
-      password: e.currentTarget.password.value,
-      callbackUrl: "/app/dashboard",
-    });
+    const rawError = res?.error;
+    const errorMessage =
+      typeof rawError === "string"
+        ? rawError === "CredentialsSignin"
+          ? "Invalid Email or Password"
+          : rawError
+        : (rawError && typeof rawError === "object" && "message" in rawError
+            ? (rawError as { message?: string }).message
+            : null) ?? "Invalid Email or Password";
 
-    console.log(res);
-  };
+    if (!res || res?.error || res?.ok === false) {
+      toast.error(errorMessage);
+      return;
+    }
 
-   const handleGithubLogin = async () => {
+    if (res?.ok) {
+      router.push("/app/dashboard");
+    }
+  });
+
+  const handleGithubLogin = async () => {
     await signIn("github", {
       callbackUrl: "/app/dashboard",
     });
@@ -48,7 +72,7 @@ export default function Login() {
         </div>
         <Form
           className="flex flex-col gap-3"
-          onSubmit={submitHandler}
+          onSubmit={handleSubmit}
           validationBehavior="native"
         >
           <Input
@@ -83,13 +107,21 @@ export default function Login() {
             variant="bordered"
           />
           <div className="flex w-full items-center justify-between px-1 py-2">
-            <p className="text-center text-small">
-               <Link href="/password/forgot" size="sm">
-                  Forgot password?
-               </Link>
-            </p>
+            <Link
+              className="text-default-500"
+              href="/password/forgot"
+              size="sm"
+            >
+              Forgot password?
+            </Link>
           </div>
-          <Button className="w-full" color="primary" type="submit">
+          <Button
+            className="w-full"
+            color="primary"
+            type="submit"
+            isDisabled={loading}
+            isLoading={loading}
+          >
             Sign In
           </Button>
         </Form>

@@ -2,10 +2,20 @@
 
 import { register } from "@/backend/controllers/auth-controller";
 
-export async function registerUser (
+export type RegisterResult =
+  | { created: true }
+  | { created: false; error: { message: string } };
+
+export async function registerUser(
   name: string,
   email: string,
   password: string
-) {
-  return await register(name, email, password);
+): Promise<RegisterResult> {
+  try {
+    await register(name, email, password);
+    return { created: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Registration failed";
+    return { created: false, error: { message } };
+  }
 }
