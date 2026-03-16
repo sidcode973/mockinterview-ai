@@ -1,6 +1,7 @@
 import { userRoles } from "@/constants/constants";
-import mongoose, { Document , CallbackWithoutResultAndOptionalError } from "mongoose";
-import bcrypt from "bcryptjs";  
+import mongoose, { Document } from "mongoose";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
@@ -25,6 +26,12 @@ export interface IUser extends Document {
     currentPeriodEnd: Date;
     nextPaymentAttempt: Date;
   };
+  resetPasswordToken?: string;      // ✅ optional
+  resetPasswordExpire?: Date;       // ✅ fixed typo + optional
+
+  // ✅ method declarations
+  getResetPasswordToken(): string;
+  comparePassword(password: string): Promise<boolean>;
 }
 
 const authProvidersSchema = new mongoose.Schema({
@@ -84,19 +91,17 @@ const userSchema = new mongoose.Schema<IUser>(
       currentPeriodEnd: Date,
       nextPaymentAttempt: Date,
     },
+    resetPasswordToken: String,     // ✅ was already here
+    resetPasswordExpire: Date,      // ✅ ADDED — was missing, root cause of the error
   },
   {
     timestamps: true,
   }
 );
 
-// Encrypt password before saving user
-//import { CallbackWithoutResultAndOptionalError } from "mongoose"
-
+// Encrypt password before saving
 userSchema.pre("save", async function () {
-  if (!this.isModified("password")) {
-    return;
-  }
+  if (!this.isModified("password")) return;
 
   try {
     if (this.password) {
@@ -111,5 +116,20 @@ userSchema.methods.comparePassword = async function (enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.models.User || mongoose.model<IUser>("User", userSchema);
+userSchema.methods.getResetPasswordToken = function (): string {
+  const resetToken = crypto.randomBytes(20).toString("hex");
+
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  this.resetPasswordExpire = Date.now() + 30 * 60 * 1000; // 30 minutes
+
+  return resetToken;
+};
+
+delete (mongoose.models as any).User;
+const User = mongoose.model<IUser>("User", userSchema);
+
 export default User;

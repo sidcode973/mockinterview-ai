@@ -1,60 +1,35 @@
 "use client";
 
 import React from "react";
-import { Button, Link, Divider, Form } from "@heroui/react";
+import { Button, Form } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { signIn } from "next-auth/react";
 import { useGenericSubmitHandler } from "../form/genericSubmitHandler";
+import { resetPassword } from "@/actions/auth-actions";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-export default function Login() {
+export default function ResetPassword({ token }: { token: string }) {
   const [isVisible, setIsVisible] = React.useState(false);
+  const [isConfirmVisible, setIsConfirmVisible] = React.useState(false);
   const [focusedField, setFocusedField] = React.useState<string | null>(null);
+
   const router = useRouter();
 
   const toggleVisibility = () => setIsVisible(!isVisible);
+  const toggleConfirmVisibility = () => setIsConfirmVisible(!isConfirmVisible);
 
   const { handleSubmit, loading } = useGenericSubmitHandler(async (data) => {
-    let res;
-    try {
-      res = await signIn("credentials", {
-        redirect: false,
-        email: data.email,
-        password: data.password,
-        callbackUrl: "/app/dashboard",
-      });
-    } catch (err) {
-      throw err;
+    const res = await resetPassword(token, data.newPassword, data.confirmPassword);
+
+    if (res?.error) {
+      return toast.error(res?.error?.message);
     }
 
-    const rawError = res?.error;
-    const errorMessage =
-      typeof rawError === "string"
-        ? rawError === "CredentialsSignin"
-          ? "Invalid Email or Password"
-          : rawError
-        : (rawError && typeof rawError === "object" && "message" in rawError
-            ? (rawError as { message?: string }).message
-            : null) ?? "Invalid Email or Password";
-
-    if (!res || res?.error || res?.ok === false) {
-      toast.error(errorMessage);
-      return;
-    }
-
-    if (res?.ok) {
-      router.push("/app/dashboard");
+    if (res?.passwordUpdated) {
+      toast.success("Password reset successfully");
+      router.push("/login");
     }
   });
-
-  const handleGithubLogin = async () => {
-    await signIn("github", { callbackUrl: "/app/dashboard" });
-  };
-
-  const handleGoogleLogin = async () => {
-    await signIn("google", { callbackUrl: "/app/dashboard" });
-  };
 
   return (
     <div
@@ -75,13 +50,6 @@ export default function Login() {
           style={{
             background: "radial-gradient(circle, #6366f1 0%, transparent 70%)",
             filter: "blur(60px)",
-          }}
-        />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 rounded-full opacity-10"
-          style={{
-            background: "radial-gradient(circle, #818cf8 0%, transparent 70%)",
-            filter: "blur(80px)",
           }}
         />
       </div>
@@ -106,16 +74,16 @@ export default function Login() {
               boxShadow: "0 8px 24px rgba(99,102,241,0.35)",
             }}
           >
-            <Icon icon="solar:login-bold" className="text-2xl text-white" />
+            <Icon icon="solar:lock-password-bold" className="text-2xl text-white" />
           </div>
           <div className="flex flex-col items-center gap-1">
             <h1
               className="text-xl font-semibold text-slate-800"
               style={{ letterSpacing: "-0.02em" }}
             >
-              Welcome Back
+              Reset Password
             </h1>
-            <p className="text-sm text-slate-400">Log in to your account to continue</p>
+            <p className="text-sm text-slate-400">Enter your new password to reset</p>
           </div>
         </div>
 
@@ -124,15 +92,15 @@ export default function Login() {
 
         <Form
           className="flex w-full flex-col gap-4"
-          onSubmit={handleSubmit}
           validationBehavior="native"
+          onSubmit={handleSubmit}
         >
-          {/* Email */}
+          {/* New Password */}
           <div
             className="w-full rounded-xl transition-all duration-300"
             style={{
               boxShadow:
-                focusedField === "email"
+                focusedField === "newPassword"
                   ? "0 0 0 3px rgba(59,130,246,0.15), 0 4px 16px rgba(59,130,246,0.1)"
                   : "0 1px 3px rgba(0,0,0,0.06)",
             }}
@@ -140,56 +108,21 @@ export default function Login() {
             <div
               className="rounded-xl border px-4 py-3 transition-colors duration-200"
               style={{
-                borderColor: focusedField === "email" ? "#93c5fd" : "#e2e8f0",
+                borderColor: focusedField === "newPassword" ? "#93c5fd" : "#e2e8f0",
                 background: "rgba(255,255,255,0.8)",
               }}
             >
               <label className="block text-xs font-semibold text-slate-600 mb-1">
-                Email Address <span className="text-red-400">*</span>
-              </label>
-              <div className="flex items-center gap-2">
-                <Icon icon="solar:letter-linear" className="text-base text-slate-400 shrink-0" />
-                <input
-                  required
-                  name="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  onFocus={() => setFocusedField("email")}
-                  onBlur={() => setFocusedField(null)}
-                  className="w-full text-sm text-slate-700 placeholder:text-slate-300 bg-transparent outline-none border-none"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Password */}
-          <div
-            className="w-full rounded-xl transition-all duration-300"
-            style={{
-              boxShadow:
-                focusedField === "password"
-                  ? "0 0 0 3px rgba(59,130,246,0.15), 0 4px 16px rgba(59,130,246,0.1)"
-                  : "0 1px 3px rgba(0,0,0,0.06)",
-            }}
-          >
-            <div
-              className="rounded-xl border px-4 py-3 transition-colors duration-200"
-              style={{
-                borderColor: focusedField === "password" ? "#93c5fd" : "#e2e8f0",
-                background: "rgba(255,255,255,0.8)",
-              }}
-            >
-              <label className="block text-xs font-semibold text-slate-600 mb-1">
-                Password <span className="text-red-400">*</span>
+                New Password <span className="text-red-400">*</span>
               </label>
               <div className="flex items-center gap-2">
                 <Icon icon="solar:lock-linear" className="text-base text-slate-400 shrink-0" />
                 <input
                   required
-                  name="password"
+                  name="newPassword"
                   type={isVisible ? "text" : "password"}
-                  placeholder="Enter your password"
-                  onFocus={() => setFocusedField("password")}
+                  placeholder="Enter your new password"
+                  onFocus={() => setFocusedField("newPassword")}
                   onBlur={() => setFocusedField(null)}
                   className="w-full text-sm text-slate-700 placeholder:text-slate-300 bg-transparent outline-none border-none"
                 />
@@ -207,19 +140,59 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Forgot password */}
-          <div className="flex w-full justify-end -mt-1">
-            <Link
-              href="/password/forgot"
-              className="text-xs font-medium text-blue-500 hover:text-blue-600 transition-colors duration-200"
+          {/* Confirm Password */}
+          <div
+            className="w-full rounded-xl transition-all duration-300"
+            style={{
+              boxShadow:
+                focusedField === "confirmPassword"
+                  ? "0 0 0 3px rgba(59,130,246,0.15), 0 4px 16px rgba(59,130,246,0.1)"
+                  : "0 1px 3px rgba(0,0,0,0.06)",
+            }}
+          >
+            <div
+              className="rounded-xl border px-4 py-3 transition-colors duration-200"
+              style={{
+                borderColor: focusedField === "confirmPassword" ? "#93c5fd" : "#e2e8f0",
+                background: "rgba(255,255,255,0.8)",
+              }}
             >
-              Forgot password?
-            </Link>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">
+                Confirm Password <span className="text-red-400">*</span>
+              </label>
+              <div className="flex items-center gap-2">
+                <Icon icon="solar:lock-linear" className="text-base text-slate-400 shrink-0" />
+                <input
+                  required
+                  name="confirmPassword"
+                  type={isConfirmVisible ? "text" : "password"}
+                  placeholder="Confirm your new password"
+                  onFocus={() => setFocusedField("confirmPassword")}
+                  onBlur={() => setFocusedField(null)}
+                  className="w-full text-sm text-slate-700 placeholder:text-slate-300 bg-transparent outline-none border-none"
+                />
+                <button
+                  type="button"
+                  onClick={toggleConfirmVisibility}
+                  className="flex items-center justify-center h-7 w-7 rounded-lg shrink-0 transition-all duration-200 hover:bg-blue-50"
+                >
+                  <Icon
+                    icon={isConfirmVisible ? "solar:eye-closed-linear" : "solar:eye-bold"}
+                    className="text-base text-slate-400 hover:text-blue-400 transition-colors duration-200"
+                  />
+                </button>
+              </div>
+            </div>
           </div>
+
+          {/* Password hint */}
+          <p className="text-xs text-slate-400 text-center -mt-1">
+            Use 8+ characters with a mix of letters, numbers & symbols
+          </p>
 
           {/* Submit */}
           <Button
-            className="group relative w-full overflow-hidden rounded-xl py-6 text-sm font-semibold text-white transition-all duration-300 hover:scale-[1.01] hover:shadow-lg active:scale-[0.99]"
+            className="group relative mt-1 w-full overflow-hidden rounded-xl py-6 text-sm font-semibold text-white transition-all duration-300 hover:scale-[1.01] hover:shadow-lg active:scale-[0.99]"
             style={{
               background: loading
                 ? "#93c5fd"
@@ -240,7 +213,7 @@ export default function Login() {
             isDisabled={loading}
             isLoading={loading}
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Resetting..." : "Reset Password"}
             <span
               className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-20deg] bg-white/10 transition-transform duration-700 group-hover:translate-x-[200%]"
               aria-hidden="true"
@@ -248,51 +221,15 @@ export default function Login() {
           </Button>
         </Form>
 
-        {/* OR divider */}
-        <div className="flex w-full items-center gap-3">
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 to-slate-200" />
-          <span className="text-xs font-medium text-slate-400 px-1">OR</span>
-          <div className="flex-1 h-px bg-gradient-to-l from-transparent via-slate-200 to-slate-200" />
-        </div>
-
-        {/* Social buttons */}
-        <div className="flex w-full flex-col gap-3">
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            className="group flex w-full items-center justify-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium text-slate-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-50/60 hover:text-slate-700 hover:shadow-sm active:scale-[0.99]"
-            style={{
-              borderColor: "#e2e8f0",
-              background: "rgba(255,255,255,0.7)",
-            }}
-          >
-            <Icon icon="flat-color-icons:google" className="text-xl shrink-0" />
-            Continue with Google
-          </button>
-
-          <button
-            type="button"
-            onClick={handleGithubLogin}
-            className="group flex w-full items-center justify-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium text-slate-600 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50/80 hover:text-slate-800 hover:shadow-sm active:scale-[0.99]"
-            style={{
-              borderColor: "#e2e8f0",
-              background: "rgba(255,255,255,0.7)",
-            }}
-          >
-            <Icon icon="fe:github" className="text-xl text-slate-700 shrink-0" />
-            Continue with GitHub
-          </button>
-        </div>
-
-        {/* Register link */}
+        {/* Back to login */}
         <p className="text-xs text-slate-400 text-center">
-          Need to create an account?{" "}
-          <Link
-            href="/register"
+          Remembered your password?{" "}
+          <a
+            href="/login"
             className="text-xs font-semibold text-blue-500 hover:text-blue-600 transition-colors duration-200"
           >
-            Register Now
-          </Link>
+            Back to Login
+          </a>
         </p>
       </div>
     </div>

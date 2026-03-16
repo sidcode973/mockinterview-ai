@@ -40,17 +40,10 @@ const options = {
           "+password"
         );
 
-        if (!user) {
-          throw new Error("Invalid Email or Password");
-        }
+        if (!user) throw new Error("Invalid Email or Password");
 
-        const isPasswordMatched = await user.comparePassword(
-          credentials?.password
-        );
-
-        if (!isPasswordMatched) {
-          throw new Error("Invalid Email or Password");
-        }
+        const isPasswordMatched = await user.comparePassword(credentials?.password ?? "");
+        if (!isPasswordMatched) throw new Error("Invalid Email or Password");
 
         return user;
       },
@@ -98,11 +91,10 @@ const options = {
           });
 
           await newUser.save();
-          user.id = newUser._id;
+          user.id = newUser._id.toString();
         } else {
           const existingProvider = existingUser.authProviders.find(
-            (provider: { provider: string }) =>
-              provider.provider === account?.provider
+            (p: { provider: string }) => p.provider === account?.provider
           );
 
           if (!existingProvider) {
@@ -111,39 +103,86 @@ const options = {
               providerId: profile?.id ?? profile?.sub ?? "",
             });
 
-            if (!existingUser.profilePicture.url) {
-              existingUser.profilePicture = {
-                url: profile?.image ?? user?.image ?? "",
-              };
-            }
+
+// ✅ Fix — always update profilePicture from OAuth if DB url is empty
+// Move it OUTSIDE the !existingProvider check
+       if (!existingUser.profilePicture?.url) {
+        existingUser.profilePicture = {
+    id: "",
+    url: profile?.image ?? user?.image ?? "",
+  };
+  await existingUser.save();
+}
 
             await existingUser.save();
           }
 
-          user.id = existingUser._id;
+          user.id = existingUser._id.toString();
         }
       }
 
       return true;
     },
-    async jwt({ token, user ,account }: { token: JWT; user?: ExtendedUser; account?: Account | null }) {
+
+    async jwt({
+      token,
+      user,
+      account,
+      trigger,
+    }: {
+      token: JWT;
+      user?: ExtendedUser;
+      account?: Account | null;
+      trigger?: string;
+    }) {
+      // ✅ First sign-in — store user + provider + image in token
       if (user) {
         token.user = user;
-        token.provider = account?.provider ?? "credentials"
-      } else {
-        await dbConnect();
+        token.provider = account?.provider ?? "credentials"; // ✅ Fix Bug 1
+        token.image = user?.image ?? (user as any)?.profilePicture?.url ?? ""; // ✅ Fix Bug 2
+      }
 
-        const dbUser = await User.findById((token.user as ExtendedUser)?.id);
+      // Refresh user from DB on subsequent requests
+      if (!user && token.user) {
+        await dbConnect();
+        const dbUser = await User.findById((token.user as ExtendedUser)?._id ?? (token.user as ExtendedUser)?.id);
         if (dbUser) {
           token.user = dbUser;
+          // ✅ Preserve OAuth image if DB profilePicture is null
+          if (!dbUser.profilePicture?.url && token.image) {
+            (token.user as any).image = token.image;
+          }
+        }
+      }
+
+      // Triggered by update() call from client
+      if (trigger === "update") {
+        const u = token.user as ExtendedUser;
+        const id = u?._id ?? u?.id;
+        if (id) {
+          await dbConnect();
+          const updatedUser = await User.findById(id);
+          if (updatedUser) {
+            token.user = updatedUser;
+            // ✅ Preserve OAuth image after profile update too
+            if (!updatedUser.profilePicture?.url && token.image) {
+              (token.user as any).image = token.image;
+            }
+          }
         }
       }
 
       return token;
     },
+
     async session({ session, token }: { session: Session; token: JWT }) {
       session.user = token.user as ExtendedUser;
-      session.provider = token.provider as string;
+      session.provider = token.provider as string; // ✅ Fix Bug 3
+
+      // ✅ Forward OAuth image to session so HeaderUser can use data?.user?.image
+      if (token.image && !(session.user as ExtendedUser)?.profilePicture?.url) {
+        (session.user as any).image = token.image;
+      }
 
       delete (session.user as ExtendedUser).password;
 
