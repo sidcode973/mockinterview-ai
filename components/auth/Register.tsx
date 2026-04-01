@@ -16,6 +16,7 @@ export default function Register() {
   const router = useRouter();
 
   const { handleSubmit, loading } = useGenericSubmitHandler(async (data) => {
+    
     const res = await registerUser(data.name, data.email, data.password);
 
     if (res && "error" in res) {
@@ -30,7 +31,7 @@ export default function Register() {
 
   return (
     <div
-      className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100"
+      className="flex min-h-screen w-full items-center justify-center bg-linear-to-br from-slate-50 via-blue-50 to-slate-100"
       style={{ fontFamily: "'DM Sans', sans-serif" }}
     >
       {/* Ambient blobs */}
@@ -92,7 +93,7 @@ export default function Register() {
         </div>
 
         {/* Divider */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+        <div className="w-full h-px bg-linear-to-r from-transparent via-slate-200 to-transparent" />
 
         <Form
           className="flex w-full flex-col gap-4"

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button, Link, Divider, Form } from "@heroui/react";
+import { Button, Link, Form } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { signIn } from "next-auth/react";
 import { useGenericSubmitHandler } from "../form/genericSubmitHandler";
@@ -9,56 +9,56 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
 export default function Login() {
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [focusedField, setFocusedField] = React.useState<string | null>(null);
-  const router = useRouter();
+    const [isVisible, setIsVisible] = React.useState(false);
+    const [focusedField, setFocusedField] = React.useState<string | null>(null);
+    const router = useRouter();
 
-  const toggleVisibility = () => setIsVisible(!isVisible);
+    const toggleVisibility = () => setIsVisible(!isVisible);
 
-  const { handleSubmit, loading } = useGenericSubmitHandler(async (data) => {
-    let res;
-    try {
-      res = await signIn("credentials", {
-        redirect: false,
-        email: data.email,
-        password: data.password,
-        callbackUrl: "/app/dashboard",
-      });
-    } catch (err) {
-      throw err;
-    }
+    const { handleSubmit, loading } = useGenericSubmitHandler(async (data) => {
+        let res;
+        try {
+          res = await signIn("credentials", {
+            redirect: false,
+            email: data.email,
+            password: data.password,
+            callbackUrl: "/app/dashboard",
+          });
+        } catch (err) {
+          throw err;
+        }
 
-    const rawError = res?.error;
-    const errorMessage =
-      typeof rawError === "string"
-        ? rawError === "CredentialsSignin"
-          ? "Invalid Email or Password"
-          : rawError
-        : (rawError && typeof rawError === "object" && "message" in rawError
-            ? (rawError as { message?: string }).message
-            : null) ?? "Invalid Email or Password";
+        const rawError = res?.error;
+        const errorMessage =
+          typeof rawError === "string"
+            ? rawError === "CredentialsSignin"
+              ? "Invalid Email or Password"
+              : rawError
+            : (rawError && typeof rawError === "object" && "message" in rawError
+                ? (rawError as { message?: string }).message
+                : null) ?? "Invalid Email or Password";
 
-    if (!res || res?.error || res?.ok === false) {
-      toast.error(errorMessage);
-      return;
-    }
+        if (!res || res?.error || res?.ok === false) {
+          toast.error(errorMessage);
+          return;
+        }
 
-    if (res?.ok) {
-      router.push("/app/dashboard");
-    }
-  });
+        if (res?.ok) {
+          router.push("/app/dashboard");
+        }
+    });
 
-  const handleGithubLogin = async () => {
-    await signIn("github", { callbackUrl: "/app/dashboard" });
-  };
+    const handleGithubLogin = async () => {
+          await signIn("github", { callbackUrl: "/app/dashboard" });
+    };
 
-  const handleGoogleLogin = async () => {
-    await signIn("google", { callbackUrl: "/app/dashboard" });
-  };
+    const handleGoogleLogin = async () => {
+          await signIn("google", { callbackUrl: "/app/dashboard" });
+    };
 
   return (
     <div
-      className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100"
+      className="flex min-h-screen w-full items-center justify-center bg-linear-to-br from-slate-50 via-blue-50 to-slate-100"
       style={{ fontFamily: "'DM Sans', sans-serif" }}
     >
       {/* Ambient blobs */}
@@ -105,7 +105,7 @@ export default function Login() {
               background: "linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)",
               boxShadow: "0 8px 24px rgba(99,102,241,0.35)",
             }}
-          >
+         >
             <Icon icon="solar:login-bold" className="text-2xl text-white" />
           </div>
           <div className="flex flex-col items-center gap-1">
@@ -120,7 +120,7 @@ export default function Login() {
         </div>
 
         {/* Divider */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+       <div className="w-full h-px bg-linear-to-r from-transparent via-slate-200 to-transparent" />
 
         <Form
           className="flex w-full flex-col gap-4"
@@ -221,7 +221,7 @@ export default function Login() {
           <Button
             className="group relative w-full overflow-hidden rounded-xl py-6 text-sm font-semibold text-white transition-all duration-300 hover:scale-[1.01] hover:shadow-lg active:scale-[0.99]"
             style={{
-              background: loading
+              background: loading 
                 ? "#93c5fd"
                 : "linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)",
               boxShadow: loading
@@ -229,7 +229,7 @@ export default function Login() {
                 : "0 4px 20px rgba(99,102,241,0.4), 0 1px 3px rgba(0,0,0,0.1)",
             }}
             type="submit"
-            endContent={
+            endContent= {
               !loading && (
                 <Icon
                   icon="akar-icons:arrow-right"
@@ -250,9 +250,9 @@ export default function Login() {
 
         {/* OR divider */}
         <div className="flex w-full items-center gap-3">
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 to-slate-200" />
+          <div className="flex-1 h-px bg-linear-to-r from-transparent via-slate-200 to-slate-200" />
           <span className="text-xs font-medium text-slate-400 px-1">OR</span>
-          <div className="flex-1 h-px bg-gradient-to-l from-transparent via-slate-200 to-slate-200" />
+          <div className="flex-1 h-px bg-linear-to-l from-transparent via-slate-200 to-slate-200" />
         </div>
 
         {/* Social buttons */}
