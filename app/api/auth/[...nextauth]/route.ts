@@ -36,9 +36,7 @@ const options = {
       async authorize(credentials) {
         await dbConnect();
 
-        const user = await User.findOne({ email: credentials?.email }).select(
-          "+password"
-        );
+        const user = await User.findOne({ email: credentials?.email }).select("+password");
 
         if (!user) throw new Error("Invalid Email or Password");
 
@@ -81,7 +79,7 @@ const options = {
           const newUser = new User({
             email: user?.email,
             name: user?.name,
-            profilePicture: { url: profile?.image ?? user?.image ?? "" },
+            profilePicture: { id: "", url: profile?.image ?? user?.image ?? "" },
             authProviders: [
               {
                 provider: account?.provider ?? "",
@@ -103,17 +101,15 @@ const options = {
               providerId: profile?.id ?? profile?.sub ?? "",
             });
 
+            await existingUser.save();
+          }
 
-// ✅ Fix — always update profilePicture from OAuth if DB url is empty
-// Move it OUTSIDE the !existingProvider check
-       if (!existingUser.profilePicture?.url) {
-        existingUser.profilePicture = {
-    id: "",
-    url: profile?.image ?? user?.image ?? "",
-  };
-  await existingUser.save();
-}
-
+          // ✅ Fix — always update profilePicture from OAuth if DB url is empty
+          if (!existingUser.profilePicture?.url) {
+            existingUser.profilePicture = {
+              id: existingUser.profilePicture?.id ?? "",
+              url: profile?.image ?? user?.image ?? "",
+            };
             await existingUser.save();
           }
 
@@ -138,19 +134,21 @@ const options = {
       // ✅ First sign-in — store user + provider + image in token
       if (user) {
         token.user = user;
-        token.provider = account?.provider ?? "credentials"; // ✅ Fix Bug 1
-        token.image = user?.image ?? (user as any)?.profilePicture?.url ?? ""; // ✅ Fix Bug 2
+        token.provider = account?.provider ?? "credentials";
+        token.image = user?.image ?? (user as ExtendedUser)?.profilePicture?.url ?? "";
       }
 
       // Refresh user from DB on subsequent requests
       if (!user && token.user) {
         await dbConnect();
-        const dbUser = await User.findById((token.user as ExtendedUser)?._id ?? (token.user as ExtendedUser)?.id);
+        const dbUser = await User.findById(
+          (token.user as ExtendedUser)?._id ?? (token.user as ExtendedUser)?.id
+        );
         if (dbUser) {
           token.user = dbUser;
           // ✅ Preserve OAuth image if DB profilePicture is null
           if (!dbUser.profilePicture?.url && token.image) {
-            (token.user as any).image = token.image;
+            (token.user as ExtendedUser).image = token.image as string;
           }
         }
       }
@@ -166,7 +164,7 @@ const options = {
             token.user = updatedUser;
             // ✅ Preserve OAuth image after profile update too
             if (!updatedUser.profilePicture?.url && token.image) {
-              (token.user as any).image = token.image;
+              (token.user as ExtendedUser).image = token.image as string;
             }
           }
         }
@@ -177,11 +175,11 @@ const options = {
 
     async session({ session, token }: { session: Session; token: JWT }) {
       session.user = token.user as ExtendedUser;
-      session.provider = token.provider as string; // ✅ Fix Bug 3
+      session.provider = token.provider as string;
 
       // ✅ Forward OAuth image to session so HeaderUser can use data?.user?.image
       if (token.image && !(session.user as ExtendedUser)?.profilePicture?.url) {
-        (session.user as any).image = token.image;
+        (session.user as ExtendedUser).image = token.image as string;
       }
 
       delete (session.user as ExtendedUser).password;

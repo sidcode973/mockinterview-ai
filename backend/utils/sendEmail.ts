@@ -6,7 +6,7 @@ interface EmailOptions {
     message: string ;
 }
 
-export default async  ( options: EmailOptions ) =>{
+const sendEmail = async (options: EmailOptions) => {
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
@@ -25,3 +25,5 @@ export default async  ( options: EmailOptions ) =>{
     
       await transporter.sendMail(message);
 }
+
+export default sendEmail;

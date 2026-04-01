@@ -34,7 +34,7 @@ export default function RootLayout({
             <Navbar/>
               <main className="container mx-auto max-w-7xl pt-16 px-6 grow">
               {children}
-            </main>
+              </main>
             <footer className="w-full flex items-center justify-center">
                <Footer />
             </footer>

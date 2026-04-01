@@ -30,13 +30,16 @@ const HeaderUser = ({ user }: { user: IUser }) => {
               className="transition-transform"
               description={user?.email}
               name={user?.name}
+               classNames={{
+               description: "text-slate-600 font-medium",  
+              }}   
             />
             {/* ✅ Google badge */}
             {provider === "google" && (
               <span className="absolute bottom-4 left-4 bg-white rounded-full p-0.5 shadow-md z-10">
                 <Icon
                   icon="flat-color-icons:google"
-                  className="text-base w-7 h-7"
+                  className="text-base w-5 h-5"
                 />
               </span>
             )}
@@ -45,7 +48,7 @@ const HeaderUser = ({ user }: { user: IUser }) => {
               <span className="absolute bottom-4 left-4 bg-white rounded-full p-0.5 shadow-md z-10">
                 <Icon
                   icon="mdi:github"
-                  className="text-base w-7 h-7 text-gray-900"
+                  className="text-base w-5 h-5 text-gray-900 -left-2"
                 />
               </span>
             )}

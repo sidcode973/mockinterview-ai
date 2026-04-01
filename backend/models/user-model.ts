@@ -129,7 +129,7 @@ userSchema.methods.getResetPasswordToken = function (): string {
   return resetToken;
 };
 
-delete (mongoose.models as any).User;
+delete (mongoose.models as Record<string, unknown>).User;
 const User = mongoose.model<IUser>("User", userSchema);
 
 export default User;

@@ -110,12 +110,6 @@ export const forgotUserPassword = catchAsyncErrors(async (email: string) => {
   await dbConnect();
 
   const user = await User.findOne({ email });
-  
-
-  console.log("1. user found:", !!user);
-  console.log("2. user _id:", user?._id);
-  console.log("3. typeof getResetPasswordToken:", typeof user?.getResetPasswordToken);
-  console.log("4. user constructor name:", user?.constructor?.name);
 
   if (!user) {
     throw new Error("User not found");

@@ -10,12 +10,12 @@ function getErrorMessage(error: unknown): string {
 }
 
 export const useGenericSubmitHandler = (callback: SubmitCallback) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    e.preventDefault();    
 
-    setLoading(true);
+    setLoading(true);  
 
     const formData = new FormData(e.currentTarget);
 

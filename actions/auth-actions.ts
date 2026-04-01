@@ -3,9 +3,7 @@
 import {
   forgotUserPassword,
   register,
-
   resetUserPassword,
-
   updateUserPassword,
   updateUserProfile,
 } from "@/backend/controllers/auth-controller";
