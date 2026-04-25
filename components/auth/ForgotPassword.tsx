@@ -14,12 +14,13 @@ export default function ForgotPassword() {
     const email = data.email;
     const res = await forgotPassword(email);
 
-    if (res?.error) {
-      return toast.error(res?.error?.message);
+    if ('error' in res && res.error) {
+      toast.error(res.error.message);
+      return;
     }
 
-    if (res?.emailsent) {
-      return toast.success("Password reset link sent to your email");
+    if ('emailSent' in res && res.emailSent) {
+      toast.success("Password reset link sent to your email");
     }
   });
 
@@ -80,7 +81,7 @@ export default function ForgotPassword() {
         </div>
 
         {/* Divider */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+        <div className="w-full h-px bg-linear-to-r from-transparent via-slate-200 to-transparent" />
 
         <Form
           className="flex w-full flex-col gap-4"
@@ -123,7 +124,7 @@ export default function ForgotPassword() {
           </div>
 
           <p className="text-xs text-slate-400 text-center -mt-1">
-            We'll send a reset link valid for 30 minutes to your inbox.
+            We&apos;ll send a reset link valid for 30 minutes to your inbox.
           </p>
 
           {/* Submit */}

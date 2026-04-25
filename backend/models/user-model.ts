@@ -26,8 +26,8 @@ export interface IUser extends Document {
     currentPeriodEnd: Date;
     nextPaymentAttempt: Date;
   };
-  resetPasswordToken?: string;      // ✅ optional
-  resetPasswordExpire?: Date;       // ✅ fixed typo + optional
+  resetPasswordToken?: string;      
+  resetPasswordExpire?: Date;       
 
   // ✅ method declarations
   getResetPasswordToken(): string;
@@ -91,8 +91,8 @@ const userSchema = new mongoose.Schema<IUser>(
       currentPeriodEnd: Date,
       nextPaymentAttempt: Date,
     },
-    resetPasswordToken: String,     // ✅ was already here
-    resetPasswordExpire: Date,      // ✅ ADDED — was missing, root cause of the error
+    resetPasswordToken: String,    
+    resetPasswordExpire: Date,      
   },
   {
     timestamps: true,

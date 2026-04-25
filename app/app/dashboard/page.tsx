@@ -1,8 +1,10 @@
 
+
 const page = () => {
+  
   return (
     <div>
-        dashboard page!
+        Dashboard
     </div>
   )
 }

@@ -6,6 +6,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 
+// ─── Interfaces ───────────────────────────────────────────────────────────────
+
 interface ExtendedUser extends NextAuthUser {
   _id?: string;
   profilePicture?: { url: string };
@@ -25,40 +27,64 @@ declare module "next-auth" {
   }
 }
 
+// ─── Options ──────────────────────────────────────────────────────────────────
+
 const options = {
+
+  // ── Providers ───────────────────────────────────────────────────────────────
   providers: [
+
     CredentialsProvider({
       name: "Credentials",
       credentials: {
         email: { type: "email" },
         password: { type: "password" },
       },
+
       async authorize(credentials) {
         await dbConnect();
 
-        const user = await User.findOne({ email: credentials?.email }).select("+password");
+        const user = await User
+          .findOne({ email: credentials?.email })
+          .select("+password");
 
-        if (!user) throw new Error("Invalid Email or Password");
+        if (!user) {
+          throw new Error("Invalid Email or Password");
+        }
 
-        const isPasswordMatched = await user.comparePassword(credentials?.password ?? "");
-        if (!isPasswordMatched) throw new Error("Invalid Email or Password");
+        const isPasswordMatched = await user.comparePassword(
+          credentials?.password ?? ""
+        );
+
+        if (!isPasswordMatched) {
+          throw new Error("Invalid Email or Password");
+        }
 
         return user;
       },
     }),
+
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
+
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
+
   ],
+
+  // ── Session ─────────────────────────────────────────────────────────────────
   session: {
     strategy: "jwt" as const,
   },
+
+  // ── Callbacks ───────────────────────────────────────────────────────────────
   callbacks: {
+
+    // ── signIn ────────────────────────────────────────────────────────────────
     async signIn({
       user,
       account,
@@ -71,15 +97,22 @@ const options = {
       await dbConnect();
 
       if (account?.provider === "credentials") {
-        user.id = user?._id ?? "";
-      } else {
-        const existingUser = await User.findOne({ email: user?.email });
 
+        user.id = user?._id ?? "";
+
+      } else {
+
+        const existingUser = await User.findOne({ email: user?.email });
+        //new user signing in with OAuth for the first time
         if (!existingUser) {
+
           const newUser = new User({
             email: user?.email,
             name: user?.name,
-            profilePicture: { id: "", url: profile?.image ?? user?.image ?? "" },
+            profilePicture: {
+              id: "",
+              url: profile?.image ?? user?.image ?? "",
+            },
             authProviders: [
               {
                 provider: account?.provider ?? "",
@@ -90,11 +123,14 @@ const options = {
 
           await newUser.save();
           user.id = newUser._id.toString();
-        } else {
+        // user already exists in DB
+        } else  {
+          // Check if this provider (google/github) is already saved for this user
+
           const existingProvider = existingUser.authProviders.find(
             (p: { provider: string }) => p.provider === account?.provider
           );
-
+            // If NOT saved yet → add it (user might have used Google first, now using GitHub)
           if (!existingProvider) {
             existingUser.authProviders.push({
               provider: account?.provider ?? "",
@@ -103,8 +139,7 @@ const options = {
 
             await existingUser.save();
           }
-
-          // ✅ Fix — always update profilePicture from OAuth if DB url is empty
+                // If profile picture is missing in DB → save it from OAuth
           if (!existingUser.profilePicture?.url) {
             existingUser.profilePicture = {
               id: existingUser.profilePicture?.id ?? "",
@@ -120,6 +155,7 @@ const options = {
       return true;
     },
 
+    // ── jwt ───────────────────────────────────────────────────────────────────
     async jwt({
       token,
       user,
@@ -131,38 +167,44 @@ const options = {
       account?: Account | null;
       trigger?: string;
     }) {
-      // ✅ First sign-in — store user + provider + image in token
+
+      // First sign-in
       if (user) {
-        token.user = user;
+        token.user     = user;
         token.provider = account?.provider ?? "credentials";
-        token.image = user?.image ?? (user as ExtendedUser)?.profilePicture?.url ?? "";
+        token.image    = user?.image ?? (user as ExtendedUser)?.profilePicture?.url ?? "";
       }
 
-      // Refresh user from DB on subsequent requests
+      // Subsequent requests — refresh from DB
       if (!user && token.user) {
         await dbConnect();
+
         const dbUser = await User.findById(
           (token.user as ExtendedUser)?._id ?? (token.user as ExtendedUser)?.id
         );
+
         if (dbUser) {
           token.user = dbUser;
-          // ✅ Preserve OAuth image if DB profilePicture is null
+
           if (!dbUser.profilePicture?.url && token.image) {
             (token.user as ExtendedUser).image = token.image as string;
           }
         }
       }
 
-      // Triggered by update() call from client
+      // Profile update trigger
       if (trigger === "update") {
         const u = token.user as ExtendedUser;
         const id = u?._id ?? u?.id;
+
         if (id) {
           await dbConnect();
+
           const updatedUser = await User.findById(id);
+
           if (updatedUser) {
             token.user = updatedUser;
-            // ✅ Preserve OAuth image after profile update too
+
             if (!updatedUser.profilePicture?.url && token.image) {
               (token.user as ExtendedUser).image = token.image as string;
             }
@@ -173,11 +215,17 @@ const options = {
       return token;
     },
 
-    async session({ session, token }: { session: Session; token: JWT }) {
-      session.user = token.user as ExtendedUser;
+    // ── session ───────────────────────────────────────────────────────────────
+    async session({
+      session,
+      token,
+    }: {
+      session: Session;
+      token: JWT;
+    }) {
+      session.user     = token.user as ExtendedUser;
       session.provider = token.provider as string;
 
-      // ✅ Forward OAuth image to session so HeaderUser can use data?.user?.image
       if (token.image && !(session.user as ExtendedUser)?.profilePicture?.url) {
         (session.user as ExtendedUser).image = token.image as string;
       }
@@ -186,12 +234,18 @@ const options = {
 
       return session;
     },
+
   },
+
+  // ── Pages ────────────────────────────────────────────────────────────────────
   pages: {
     signIn: "/login",
   },
+
   secret: process.env.NEXTAUTH_SECRET,
+
 };
 
-export const GET = NextAuth(options);
+// ─── Exports ──────────────────────────────────────────────────────────────────
+export const GET  = NextAuth(options);
 export const POST = NextAuth(options);
