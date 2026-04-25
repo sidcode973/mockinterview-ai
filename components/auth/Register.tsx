@@ -20,7 +20,8 @@ export default function Register() {
     const res = await registerUser(data.name, data.email, data.password);
 
     if (res && "error" in res) {
-      return toast.error(res.error.message);
+      toast.error(res.error.message);
+      return;
     }
 
     if (res?.created) {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-type SubmitCallback = (data: Record<string, string>) => Promise<any>;
+type SubmitCallback = (data: Record<string, string>) => Promise<void>;
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;

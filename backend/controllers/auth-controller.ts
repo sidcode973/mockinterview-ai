@@ -1,6 +1,6 @@
 import dbConnect from "../config/dbconnect";
 import User from "../models/user-model";
-import { catchAsyncErrors } from "../config/middlewares/catchAsyncErrors";
+import { catchAsyncErrors } from "../middlewares/catchAsyncErrors";
 import { delete_file, upload_file } from "../utils/cloudinary";
 import { resetPasswordHTMLTemplate } from "../utils/emailTemplate";
 import sendEmail from "../utils/sendEmail";

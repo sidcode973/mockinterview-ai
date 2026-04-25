@@ -17,13 +17,13 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   const router = useRouter();
 
   return (
-    <HeroUIProvider navigate={router.push}>
+    <HeroUIProvider navigate={router.push}>  
       <ThemeProvider {...themeProps}>
         <SessionProvider>
           <Toaster position="top-center" containerStyle={{ zIndex: 9999 }} />
           {children}
-        </SessionProvider>
-      </ThemeProvider>
+        </SessionProvider>   
+      </ThemeProvider>         
     </HeroUIProvider>
   )
 }
