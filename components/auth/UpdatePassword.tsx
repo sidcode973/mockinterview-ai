@@ -51,7 +51,7 @@ export default function UpdatePassword() {
           boxShadow:
             "0 2px 4px rgba(0,0,0,0.04), 0 12px 40px rgba(59,130,246,0.08), 0 0 0 1px rgba(59,130,246,0.04)",
         }}
-      >00
+      >
         {/* Header — icon on top, centered */}
         <div className="flex flex-col items-center gap-2">
           <div
@@ -191,11 +191,6 @@ export default function UpdatePassword() {
             />
           </Button>
         </form>
-
-        {/* Footer */}
-        <p className="text-[11px] text-slate-400 text-center -mt-1">
-          Make sure to save your new password somewhere safe.
-        </p>
       </div>
     </div>
   );
