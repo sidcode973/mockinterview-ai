@@ -19,8 +19,9 @@ async function getInterviews() {
 
     const data = await response.json();
     return data;
-  } catch (error: any) {
-    throw new Error(error?.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "An error occurred";
+    throw new Error(message);
   }
 }
 

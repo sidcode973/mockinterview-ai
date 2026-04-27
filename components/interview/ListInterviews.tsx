@@ -15,7 +15,7 @@ import { Icon } from "@iconify/react";
 import { IInterview } from "@/backend/models/interview-model";
 import { Key } from "@react-types/shared";
 import { useRouter } from "next/navigation";
-import { deleteInterview } from "@/actions/interview-action";
+import { deleteInterview } from "@/actions/interview-actions";
 import toast from "react-hot-toast";
 
 export const columns = [
@@ -36,18 +36,19 @@ export default function ListInterviews({ data }: ListInterviewProps) {
 
   const router = useRouter();
 
-  const deleteInterviewHandler = async (interviewId: string) => {
+  const deleteInterviewHandler = React.useCallback(async (interviewId: string) => {
     const res = await deleteInterview(interviewId);
 
-    if (res?.error) {
-      return toast.error(res?.error?.message);
+    if (res && "error" in res) {
+      toast.error(res.error.message);
+      return;
     }
 
-    if (res?.deleted) {
+    if (res && "deleted" in res && res.deleted) {
       toast.success("Interview deleted successfully");
       router.push("/app/interviews");
     }
-  };
+  }, [router]);
 
   const renderCell = React.useCallback(
     (interview: IInterview, columnKey: Key) => {
@@ -80,28 +81,28 @@ export default function ListInterviews({ data }: ListInterviewProps) {
               size="sm"
               variant="flat"
             >
-              {cellValue}
+              {interview.status}
             </Chip>
           );
         case "actions":
           return (
-            <div className="relative flex items-center gap-2">
+            <div className="flex items-center justify-center w-full gap-2">
               <Tooltip color="danger" content="Delete Interview">
                 <span className="text-lg text-danger cursor-pointer active:opacity-50">
                   <Icon
                     icon="solar:trash-bin-trash-outline"
                     fontSize={21}
-                    onClick={() => deleteInterviewHandler(interview._id)}
+                    onClick={() => deleteInterviewHandler(interview._id.toString())}
                   />
                 </span>
               </Tooltip>
             </div>
           );
         default:
-          return cellValue;
+          return String(cellValue ?? "");
       }
     },
-    []
+    [deleteInterviewHandler]
   );
 
   return (
@@ -119,9 +120,11 @@ export default function ListInterviews({ data }: ListInterviewProps) {
         </TableHeader>
         <TableBody items={interviews}>
           {(item) => (
-            <TableRow key={item._id}>
+            <TableRow key={item._id.toString()}>
               {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
+                <TableCell className={columnKey === "actions" ? "text-center" : ""}>
+                  {renderCell(item, columnKey)}
+                </TableCell>
               )}
             </TableRow>
           )}
