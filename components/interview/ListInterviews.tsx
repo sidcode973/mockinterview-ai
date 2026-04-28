@@ -10,13 +10,13 @@ import {
   TableCell,
   Chip,
   Tooltip,
-} from "@heroui/react";
-import { Icon } from "@iconify/react";
-import { IInterview } from "@/backend/models/interview-model";
-import { Key } from "@react-types/shared";
-import { useRouter } from "next/navigation";
-import { deleteInterview } from "@/actions/interview-actions";
-import toast from "react-hot-toast";
+} from "@heroui/react" ;
+import { Icon } from "@iconify/react" ;
+import { IInterview } from "@/backend/models/interview-model" ;
+import { Key } from "@react-types/shared" ;
+import { useRouter } from "next/navigation" ;
+import { deleteInterview } from "@/actions/interview-actions" ;
+import toast from "react-hot-toast" ;
 
 export const columns = [
   { name: "INTERVIEW", uid: "interview" },
