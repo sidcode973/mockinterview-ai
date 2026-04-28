@@ -1,5 +1,6 @@
 
 import dbConnect from "../config/dbconnect";
+import { generateQuestions } from "../GoogleGenAI/GoogleGenAI";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors";
 import Interview from "../models/interview-model";
 import { InterviewBody } from "../types/interview-types";
@@ -31,7 +32,19 @@ export const createInterview = catchAsyncErrors(async (body: InterviewBody) => {
     role,
   } = body;
 
-  const questions = mockQuestions(numOfQuestions);
+    const questions = await generateQuestions(
+    industry,
+    topic,
+    type,
+    role,
+    numOfQuestions,
+    duration,
+    difficulty
+  );
+
+  console.log(questions);
+
+  // const questions = mockQuestions(numOfQuestions);
 
   const newInterview = await Interview.create({
     industry,
