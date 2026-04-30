@@ -1,15 +1,13 @@
-import { Button } from '@heroui/react'
-import React from 'react'
+"use client";
+
+import React from "react";
 
 const Results = () => {
-    const handleClick = () => {
-
-    }
   return (
     <div>
-      <Button onPress={handleClick}>Click me </Button>
+      <p>Results coming soon.</p>
     </div>
-  )
-}
+  );
+};
 
-export default Results
+export default Results;
