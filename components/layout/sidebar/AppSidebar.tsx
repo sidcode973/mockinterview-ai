@@ -43,61 +43,66 @@ const AppSiderbar = () => {
   };
 
   return (
-    <div className="sticky  z-10 h-full">
-      <Listbox
-        aria-label="User Menu"
-        className="py-8 gap-0 divide-y divide-default-300/50 dark:divide-default-100/80 bg-content1 overflow-visible shadow-small rounded-medium h-full"
-        itemClasses={{
-          base: "px-3 first:rounded-t-medium last:rounded-b-medium rounded-none h-12 data-[hover=true]:bg-default-100/80",
-        }}
-        selectedKeys={[selectedKey]}
-        onAction={handleAction}
-      >
-        <ListboxItem
-          key="#"
-          className="mt-3"
-          textValue="New Interview"
-          startContent={
-            <Button
-              className="bg-foreground font-medium text-background w-full"
-              color="secondary"
-              endContent={<Icon icon="ep:circle-plus-filled" />}
-              variant="flat"
-              as={Link}
-              href="/app/interviews/new"
-            >
-              New Interview
-            </Button>
-          }
-        />
-        <>
-          {pages?.map((page) => (
-            <ListboxItem
-              key={page.path}
-              className={`mt-3 gap-20 ${
-                selectedKey?.toString()?.includes(page.path)
-                  ? "bg-gray-100 dark:bg-gray-800"
-                  : ""
-              }`}
-              startContent={
-                <IconWrapper
-                  className={`bg-${
-                    getPageIconAndPath(page.path).color
-                  }/10 text-${getPageIconAndPath(page.path).color}`}
-                >
-                  <Icon
-                    icon={getPageIconAndPath(page.path)?.icon}
-                    className="text-lg"
-                  />
-                </IconWrapper>
-              }
-              textValue=""
-            >
-              {page.title}
-            </ListboxItem>
-          ))}
-        </>
-      </Listbox>
+    <div className="h-full p-2">
+      <div className="h-full rounded-xl border border-default-200/60 dark:border-default-100/20 bg-gradient-to-b from-content1 to-content1/80 shadow-lg overflow-hidden backdrop-blur-sm">
+        {/* Top accent bar */}
+        <div className="h-0.5 w-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 rounded-t-xl" />
+
+        <Listbox
+          aria-label="User Menu"
+          className="py-3 gap-0 bg-transparent h-full"
+          itemClasses={{
+            base: "px-3 rounded-lg mx-1 h-11 data-[hover=true]:bg-default-100/70 transition-colors duration-150",
+          }}
+          selectedKeys={[selectedKey]}
+          onAction={handleAction}
+        >
+          <ListboxItem
+            key="#"
+            className="mb-2 px-2"
+            textValue="New Interview"
+            startContent={
+              <Button
+                className="bg-foreground font-medium text-background w-full"
+                color="secondary"
+                endContent={<Icon icon="ep:circle-plus-filled" />}
+                variant="flat"
+                as={Link}
+                href="/app/interviews/new"
+              >
+                New Interview
+              </Button>
+            }
+          />
+          <>
+            {pages?.map((page) => (
+              <ListboxItem
+                key={page.path}
+                className={`gap-3 ${
+                  selectedKey?.toString()?.includes(page.path)
+                    ? "bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border-l-2 border-violet-500 !rounded-l-none font-semibold"
+                    : ""
+                }`}
+                startContent={
+                  <IconWrapper
+                    className={`bg-${
+                      getPageIconAndPath(page.path).color
+                    }/10 text-${getPageIconAndPath(page.path).color}`}
+                  >
+                    <Icon
+                      icon={getPageIconAndPath(page.path)?.icon}
+                      className="text-lg"
+                    />
+                  </IconWrapper>
+                }
+                textValue=""
+              >
+                {page.title}
+              </ListboxItem>
+            ))}
+          </>
+        </Listbox>
+      </div>
     </div>
   );
 };

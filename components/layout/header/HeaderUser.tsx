@@ -4,8 +4,8 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Avatar,
 } from "@heroui/react";
-import { User } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { IUser } from "@/backend/models/user-model";
 import { signOut, useSession } from "next-auth/react";
@@ -18,40 +18,32 @@ const HeaderUser = ({ user }: { user: IUser }) => {
     <div className="flex items-center gap-4">
       <Dropdown placement="bottom-start">
         <DropdownTrigger>
-          <button className="relative w-fit">
-            <User
-              as="div"
-              avatarProps={{
-                isBordered: true,
-                src: user?.profilePicture?.url
-                  ? user?.profilePicture?.url
-                  : "/images/default_user.png",
-              }}
-              className="transition-transform"
-              description={user?.email}
-              name={user?.name}
-               classNames={{
-               description: "text-slate-600 font-medium",  
-              }}   
-            />
-            {/* ✅ Google badge */}
-            {provider === "google" && (
-              <span className="absolute bottom-4 left-4 bg-white rounded-full p-0.5 shadow-md z-10">
-                <Icon
-                  icon="flat-color-icons:google"
-                  className="text-base w-5 h-5"
-                />
-              </span>
-            )}
-            {/* ✅ GitHub badge */}
-            {provider === "github" && (
-              <span className="absolute bottom-4 left-4 bg-white rounded-full p-0.5 shadow-md z-10">
-                <Icon
-                  icon="mdi:github"
-                  className="text-base w-5 h-5 text-gray-900 -left-2"
-                />
-              </span>
-            )}
+          <button className="flex items-center gap-3 outline-none">
+            <div className="relative w-fit">
+              <Avatar
+                isBordered
+                src={
+                  user?.profilePicture?.url
+                    ? user?.profilePicture?.url
+                    : "/images/default_user.png"
+                }
+                size="sm"
+              />
+              {provider === "google" && (
+                <span className="absolute -bottom-0.5 -right-0.5 bg-white rounded-full p-0.5 shadow-md z-10">
+                  <Icon icon="flat-color-icons:google" className="w-3.5 h-3.5" />
+                </span>
+              )}
+              {provider === "github" && (
+                <span className="absolute -bottom-0.5 -right-0.5 bg-white rounded-full p-0.5 shadow-md z-10">
+                  <Icon icon="mdi:github" className="w-3.5 h-3.5 text-gray-900" />
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="text-sm font-semibold leading-tight">{user?.name}</span>
+              <span className="text-xs text-slate-500 font-medium leading-tight">{user?.email}</span>
+            </div>
           </button>
         </DropdownTrigger>
         <DropdownMenu aria-label="User Actions" variant="flat">

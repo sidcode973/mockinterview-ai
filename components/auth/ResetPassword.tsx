@@ -21,11 +21,12 @@ export default function ResetPassword({ token }: { token: string }) {
   const { handleSubmit, loading } = useGenericSubmitHandler(async (data) => {
     const res = await resetPassword(token, data.newPassword, data.confirmPassword);
 
-    if (res?.error) {
-      return toast.error(res?.error?.message);
+    if ("error" in res) {
+      toast.error(res.error?.message);
+      return;
     }
 
-    if (res?.passwordUpdated) {
+    if ("passwordUpdated" in res && res.passwordUpdated) {
       toast.success("Password reset successfully");
       router.push("/login");
     }

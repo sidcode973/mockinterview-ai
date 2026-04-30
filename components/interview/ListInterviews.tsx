@@ -10,6 +10,7 @@ import {
   TableCell,
   Chip,
   Tooltip,
+  Button,
 } from "@heroui/react" ;
 import { Icon } from "@iconify/react" ;
 import { IInterview } from "@/backend/models/interview-model" ;
@@ -17,6 +18,7 @@ import { Key } from "@react-types/shared" ;
 import { useRouter } from "next/navigation" ;
 import { deleteInterview } from "@/actions/interview-actions" ;
 import toast from "react-hot-toast" ;
+import Link from "next/link"
 
 export const columns = [
   { name: "INTERVIEW", uid: "interview" },
@@ -86,23 +88,56 @@ export default function ListInterviews({ data }: ListInterviewProps) {
           );
         case "actions":
           return (
-            <div className="flex items-center justify-center w-full gap-2">
-              <Tooltip color="danger" content="Delete Interview">
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                  <Icon
-                    icon="solar:trash-bin-trash-outline"
-                    fontSize={21}
-                    onClick={() => deleteInterviewHandler(interview._id.toString())}
-                  />
-                </span>
-              </Tooltip>
-            </div>
+            <>
+              {interview?.answered === 0 &&
+              interview?.status !== "completed" ? (
+                <Button
+                  className="bg-foreground font-medium text-background w-full"
+                  color="secondary"
+                  endContent={
+                    <Icon icon="solar:arrow-right-linear" fontSize={20} />
+                  }
+                  variant="flat"
+                  as={Link}
+                  href={`/app/conduct/${interview._id}`}
+                >
+                  Start
+                </Button>
+              ) : (
+                <div className="relative flex items-center gap-2">
+                  {interview?.status !== "completed" && (
+                    <Tooltip color="danger" content="Continue Interview">
+                      <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                        <Icon
+                          icon="solar:round-double-alt-arrow-right-bold"
+                          fontSize={22}
+                          onClick={() =>
+                            router.push(
+                              `/app/conduct/${interview._id}`
+                            )
+                          }
+                        />
+                      </span>
+                    </Tooltip>
+                  )}
+                  <Tooltip color="danger" content="Delete Interview">
+                    <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                      <Icon
+                        icon="solar:trash-bin-trash-outline"
+                        fontSize={21}
+                        onClick={() => deleteInterviewHandler(interview._id.toString())}
+                      />
+                    </span>
+                  </Tooltip>
+                </div>
+              )}
+            </>
           );
         default:
           return String(cellValue ?? "");
       }
     },
-    [deleteInterviewHandler]
+    [deleteInterviewHandler, router]
   );
 
   return (
@@ -122,9 +157,7 @@ export default function ListInterviews({ data }: ListInterviewProps) {
           {(item) => (
             <TableRow key={item._id.toString()}>
               {(columnKey) => (
-                <TableCell className={columnKey === "actions" ? "text-center" : ""}>
-                  {renderCell(item, columnKey)}
-                </TableCell>
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}
             </TableRow>
           )}
