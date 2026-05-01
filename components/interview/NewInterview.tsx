@@ -58,14 +58,9 @@ export default function NewInterview() {
   });
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold tracking-tight">Create New Interview</h2>
-        <p className="text-default-500 text-sm mt-1">Configure your AI-powered mock interview session</p>
-      </div>
-
+    <div className="max-w-3xl mx-auto">
       <Form validationBehavior="native" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           <div className="col-span-1">
             <div className="bg-default-50/50 rounded-xl p-6 border border-default-200/60">
               <h3 className="text-sm font-semibold text-default-600 uppercase tracking-wider mb-4">Interview Setup</h3>
