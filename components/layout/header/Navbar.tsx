@@ -26,14 +26,13 @@ const Navbar = () => {
   const { data } = useSession();
   const user = data?.user as IUser;
 
-  console.log(user);
-
   return (
     <HeroUINavbar
       maxWidth="xl"
       position="sticky"
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
+      className="border-b border-default-200/60 bg-background/80 backdrop-blur-md"
     >
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
@@ -54,10 +53,8 @@ const Navbar = () => {
           <>
             <NavbarItem className="hidden sm:flex">
               <Button
-                className="bg-foreground font-medium text-background px-5"
-                color="secondary"
-                radius="full"
-                variant="flat"
+                size="sm"
+                className="bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-medium rounded-full px-5"
                 as={Link}
                 href="/subscribe"
               >
@@ -71,15 +68,7 @@ const Navbar = () => {
         ) : (
           <>
             {data === undefined && (
-              <div className="max-w-38 w-full flex items-center gap-3">
-                <div>
-                  <Skeleton className="flex rounded-full w-12 h-12" />
-                </div>
-                <div className="w-full flex flex-col gap-2">
-                  <Skeleton className="h-3 w-3/5 rounded-lg" />
-                  <Skeleton className="h-3 w-4/5 rounded-lg" />
-                </div>
-              </div>
+              <Skeleton className="h-8 w-32 rounded-full" />
             )}
 
             {data === null && (
