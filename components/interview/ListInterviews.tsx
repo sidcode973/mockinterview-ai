@@ -60,8 +60,8 @@ export default function ListInterviews({ data }: ListInterviewProps) {
         case "interview":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">{interview?.topic}</p>
-              <p className="text-bold text-sm capitalize text-default-400">
+              <p className="font-medium text-default-800 capitalize">{interview?.topic}</p>
+              <p className="text-xs text-default-400 mt-0.5 capitalize">
                 {interview?.type}
               </p>
             </div>
@@ -69,8 +69,8 @@ export default function ListInterviews({ data }: ListInterviewProps) {
         case "result":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">0/10</p>
-              <p className="text-bold text-sm capitalize text-default-400">
+              <p className="font-semibold text-default-800 capitalize">0/10</p>
+              <p className="text-xs text-default-400 capitalize">
                 {interview?.numOfQuestions} questions
               </p>
             </div>
@@ -78,8 +78,8 @@ export default function ListInterviews({ data }: ListInterviewProps) {
         case "status":
           return (
             <Chip
-              className="capitalize"
-              color={interview?.status === "completed" ? "success" : "danger"}
+              className="capitalize text-xs font-medium"
+              color={interview?.status === "completed" ? "success" : "warning"}
               size="sm"
               variant="flat"
             >
@@ -92,12 +92,11 @@ export default function ListInterviews({ data }: ListInterviewProps) {
               {interview?.answered === 0 &&
               interview?.status !== "completed" ? (
                 <Button
-                  className="bg-foreground font-medium text-background w-full"
-                  color="secondary"
+                  size="sm"
+                  className="bg-foreground text-background font-medium rounded-lg min-w-[100px]"
                   endContent={
-                    <Icon icon="solar:arrow-right-linear" fontSize={20} />
+                    <Icon icon="solar:arrow-right-linear" fontSize={16} />
                   }
-                  variant="flat"
                   as={Link}
                   href={`/app/conduct/${interview._id}`}
                 >
@@ -106,28 +105,36 @@ export default function ListInterviews({ data }: ListInterviewProps) {
               ) : (
                 <div className="relative flex items-center gap-2">
                   {interview?.status !== "completed" && (
-                    <Tooltip color="danger" content="Continue Interview">
-                      <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                    <Tooltip color="primary" content="Continue Interview">
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        color="primary"
+                        onPress={() =>
+                          router.push(`/app/conduct/${interview._id}`)
+                        }
+                      >
                         <Icon
                           icon="solar:round-double-alt-arrow-right-bold"
-                          fontSize={22}
-                          onClick={() =>
-                            router.push(
-                              `/app/conduct/${interview._id}`
-                            )
-                          }
+                          fontSize={20}
                         />
-                      </span>
+                      </Button>
                     </Tooltip>
                   )}
                   <Tooltip color="danger" content="Delete Interview">
-                    <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      color="danger"
+                      onPress={() => deleteInterviewHandler(interview._id.toString())}
+                    >
                       <Icon
                         icon="solar:trash-bin-trash-outline"
-                        fontSize={21}
-                        onClick={() => deleteInterviewHandler(interview._id.toString())}
+                        fontSize={19}
                       />
-                    </span>
+                    </Button>
                   </Tooltip>
                 </div>
               )}
@@ -142,27 +149,45 @@ export default function ListInterviews({ data }: ListInterviewProps) {
 
   return (
     <div className="my-4">
-      <Table aria-label="Interivews table">
-        <TableHeader columns={columns}>
-          {(column) => (
-            <TableColumn
-              key={column.uid}
-              align={column.uid === "actions" ? "center" : "start"}
-            >
-              {column.name}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody items={interviews}>
-          {(item) => (
-            <TableRow key={item._id.toString()}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold tracking-tight text-default-800">My Interviews</h2>
+        <Chip size="sm" variant="flat" color="default" className="text-xs font-medium text-default-500">
+          {interviews.length} {interviews.length === 1 ? "interview" : "interviews"}
+        </Chip>
+      </div>
+
+      {interviews.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <Icon icon="solar:clipboard-list-linear" fontSize={48} className="text-default-300 mb-4" />
+          <p className="text-default-500 font-medium">No interviews yet</p>
+          <p className="text-default-400 text-sm mt-1">Create your first interview to get started</p>
+        </div>
+      ) : (
+        <div className="rounded-xl border border-default-200/60 shadow-sm overflow-hidden">
+          <Table aria-label="Interviews table" removeWrapper>
+            <TableHeader columns={columns}>
+              {(column) => (
+                <TableColumn
+                  key={column.uid}
+                  align={column.uid === "actions" ? "center" : "start"}
+                  className="text-xs font-semibold text-default-500 uppercase tracking-wider bg-default-50/80"
+                >
+                  {column.name}
+                </TableColumn>
               )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            </TableHeader>
+            <TableBody items={interviews}>
+              {(item) => (
+                <TableRow key={item._id.toString()}>
+                  {(columnKey) => (
+                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 }

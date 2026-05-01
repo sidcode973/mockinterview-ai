@@ -58,34 +58,18 @@ export default function NewInterview() {
   });
 
   return (
-    <div className="p-4">
+    <div className="max-w-3xl mx-auto p-4">
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold tracking-tight">Create New Interview</h2>
+        <p className="text-default-500 text-sm mt-1">Configure your AI-powered mock interview session</p>
+      </div>
+
       <Form validationBehavior="native" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 w-full">
           <div className="col-span-1">
-            <h3 className="text-xl">Select all options below:</h3>
-          </div>
-
-          <div className="col-span-1">
-            <div className="flex gap-4 max-w-sm justify-end items-center">
-              <Button
-                color="primary"
-                type="submit"
-                isLoading={loading}
-                isDisabled={loading}
-              >
-                Create Interview
-              </Button>
-              <Button type="reset" variant="bordered">
-                Reset
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16 w-full">
-          <div className="col-span-1">
-            <div className="w-full flex flex-col space-y-4">
-              <div className="flex flex-col gap-4 w-full max-w-sm">
+            <div className="bg-default-50/50 rounded-xl p-6 border border-default-200/60">
+              <h3 className="text-sm font-semibold text-default-600 uppercase tracking-wider mb-4">Interview Setup</h3>
+              <div className="flex flex-col gap-4 w-full">
                 <Select
                   isRequired
                   label="Industry"
@@ -93,6 +77,7 @@ export default function NewInterview() {
                   name="industry"
                   placeholder="Select Industry"
                   onChange={handleIndustryChange}
+                  variant="bordered"
                 >
                   {interviewIndustries?.map((industry) => (
                     <SelectItem key={industry}>
@@ -108,6 +93,7 @@ export default function NewInterview() {
                   name="topic"
                   placeholder="Select Topic"
                   disabled={!selectedIndustry}
+                  variant="bordered"
                 >
                   {topics?.map((topic) => (
                     <SelectItem key={topic}>
@@ -122,6 +108,7 @@ export default function NewInterview() {
                   labelPlacement="outside"
                   name="type"
                   placeholder="Select interview type"
+                  variant="bordered"
                 >
                   {interviewTypes?.map((type) => (
                     <SelectItem key={type}>
@@ -137,19 +124,23 @@ export default function NewInterview() {
                   labelPlacement="outside"
                   name="role"
                   placeholder="software developer, data scientist, etc."
+                  variant="bordered"
                 />
               </div>
             </div>
           </div>
+
           <div className="col-span-1">
-            <div className="w-full flex flex-col space-y-4">
-              <div className="flex flex-col gap-4 w-full max-w-sm">
+            <div className="bg-default-50/50 rounded-xl p-6 border border-default-200/60">
+              <h3 className="text-sm font-semibold text-default-600 uppercase tracking-wider mb-4">Preferences</h3>
+              <div className="flex flex-col gap-4 w-full">
                 <Select
                   isRequired
                   label="Difficulty"
                   labelPlacement="outside"
                   name="difficulty"
                   placeholder="Select difficulty"
+                  variant="bordered"
                 >
                   {interviewDifficulties?.map((difficulty) => (
                     <SelectItem key={difficulty}>
@@ -165,6 +156,7 @@ export default function NewInterview() {
                   labelPlacement="outside"
                   name="numOfQuestions"
                   placeholder="Enter no of questions"
+                  variant="bordered"
                 />
 
                 <Input
@@ -174,10 +166,27 @@ export default function NewInterview() {
                   labelPlacement="outside"
                   name="duration"
                   placeholder="Enter duration"
+                  variant="bordered"
                 />
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6 w-full">
+          <Button type="reset" variant="flat" size="md">
+            Reset
+          </Button>
+          <Button
+            color="primary"
+            type="submit"
+            size="md"
+            className="px-8 font-medium"
+            isLoading={loading}
+            isDisabled={loading}
+          >
+            Create Interview
+          </Button>
         </div>
       </Form>
     </div>

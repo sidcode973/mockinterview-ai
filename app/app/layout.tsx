@@ -21,7 +21,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="flex w-full flex-1">
 
             {/* Sidebar — fixed width, sticky within viewport */}
-            <div className="w-64 shrink-0 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto">
+            <div className="w-64 shrink-0 sticky top-16 overflow-y-auto">
                 <AppSidebar />
             </div>
 
