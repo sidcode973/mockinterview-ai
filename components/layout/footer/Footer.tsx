@@ -29,8 +29,8 @@ export default function Footer() {
           </div>
 
           {/* 🔹 Navigation Links */}
-          <div className="flex flex-col gap-4">
-            <p className="text-xs font-semibold uppercase tracking-widest text-default-400">
+          <div className="flex flex-col ml-38 gap-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-default-400  ">
               Quick Links
             </p>
 
@@ -60,7 +60,7 @@ export default function Footer() {
           </div>
 
           {/* 🔥 CTA Section */}
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-5 ml-17">
             <p className="text-xs font-semibold uppercase tracking-widest text-default-400">
               Ready to Ace It?
             </p>
@@ -104,12 +104,6 @@ export default function Footer() {
               {siteConfig?.name}
             </span>. All rights reserved.
           </p>
-
-          <div className="flex items-center gap-2 text-xs text-default-400">
-            <span>Made with</span>
-            <span className="text-[#FF1CF7] animate-pulse">♥</span>
-            <span>for job seekers</span>
-          </div>
 
         </div>
       </div>

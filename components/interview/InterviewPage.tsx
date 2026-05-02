@@ -211,7 +211,7 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
       <div className="flex flex-wrap gap-1.5">
         {interview?.questions?.map((question: IQuestion, index: number) => (
           <Chip
-            key={question?._id?.toString()}
+            key={index}
             color={answers[question?._id?.toString()] ? "success" : "default"}
             size="sm"
             variant="flat"

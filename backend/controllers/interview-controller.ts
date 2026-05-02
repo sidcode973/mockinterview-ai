@@ -7,16 +7,6 @@ import { InterviewBody } from "../types/interview-types";
 import { getCurrentUser } from "../utils/auth";
 
 
-const mockQuestions = (numOfQuestions: number) => {
-  const questions = [];
-  for (let i = 0; i < numOfQuestions; i++) {
-    questions.push({
-      question: `Mock question ${i + 1}`,
-      answer: `Mock answer ${i + 1}`,
-    });
-  }
-  return questions;
-};
 
 export const createInterview = catchAsyncErrors(async (body: InterviewBody) => {
   await dbConnect();
