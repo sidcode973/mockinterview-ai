@@ -245,7 +245,7 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
 
       <span className="text-center h-40">
         <span
-          className={`tracking-tight inline font-semibold bg-clip-text text-transparent bg-gradient-to-b from-[#FF1CF7] to-[#b249f8] text-[1.4rem] lg:text-2.5xl flex items-center justify-center h-full`}
+          className={`tracking-tight inline font-semibold bg-clip-text text-transparent bg-linear-to-b from-[#FF1CF7] to-[#b249f8] text-[1.4rem] lg:text-2.5xl flex items-center justify-center h-full`}
         >
           {currentQuestion?.question}
         </span>
@@ -259,13 +259,13 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
 
       <div className="flex justify-between items-center mt-5">
         <Button
-          className="bg-foreground px-[18px] py-2 font-medium text-background"
+          className="bg-foreground px-4.5 py-2 font-medium text-background"
           radius="full"
           color="secondary"
           variant="flat"
           startContent={
             <Icon
-              className="flex-none outline-none [&>path]:stroke-[2]"
+              className="flex-none outline-none [&>path]:stroke-2"
               icon="solar:arrow-left-linear"
               width={20}
             />
@@ -278,13 +278,13 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
         </Button>
 
         <Button
-          className="px-[28px] py-2"
+          className="px-7 py-2"
           radius="full"
           variant="flat"
           color="success"
           startContent={
             <Icon
-              className="flex-none outline-none [&>path]:stroke-[2]"
+              className="flex-none outline-none [&>path]:stroke-2"
               icon="solar:compass-big-bold"
               width={18}
             />
@@ -297,13 +297,13 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
         </Button>
 
         <Button
-          className="bg-foreground px-[18px] py-2 font-medium text-background"
+          className="bg-foreground px-4.5 py-2 font-medium text-background"
           radius="full"
           color="secondary"
           variant="flat"
           endContent={
             <Icon
-              className="flex-none outline-none [&>path]:stroke-[2]"
+              className="flex-none outline-none [&>path]:stroke-2"
               icon="solar:arrow-right-linear"
               width={20}
             />
