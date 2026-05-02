@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation" ;
 import { deleteInterview } from "@/actions/interview-actions" ;
 import toast from "react-hot-toast" ;
 import Link from "next/link"
+import { calculateAverageScore } from "@/helpers/interview";
 
 export const columns = [
   { name: "INTERVIEW", uid: "interview" },
@@ -69,9 +70,11 @@ export default function ListInterviews({ data }: ListInterviewProps) {
         case "result":
           return (
             <div className="flex flex-col">
-              <p className="font-semibold text-default-800 capitalize">0/10</p>
-              <p className="text-xs text-default-400 capitalize">
-                {interview?.numOfQuestions} questions
+              <p className="font-semibold text-default-800">
+                {interview?.answered} / {interview?.numOfQuestions}
+              </p>
+              <p className="text-xs text-default-400 mt-0.5">
+                {interview?.numOfQuestions} Questions
               </p>
             </div>
           );

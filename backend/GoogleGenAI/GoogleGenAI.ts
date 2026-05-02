@@ -61,18 +61,22 @@ export const generateQuestions = async (
 };
 
 function extractScoresAndSuggestion(content: string) {
-  const overAllScoreMatch = content.match(/Overall score=(\d+)/);
-  const relevanceScoreMatch = content.match(/Relevance score=(\d+)/);
-  const clarityScoreMatch = content.match(/Clarity score=(\d+)/);
-  const completenessScoreMatch = content.match(/Completeness score=(\d+)/);
-  const suggestionsMatch = content.match(/Suggestions=(.*)/);
+  // Strip markdown bold/italic markers so **Overall score=5** still matches
+  const clean = content.replace(/\*+/g, "").replace(/_+/g, "");
+
+  // Flexible regex: case-insensitive, allows spaces around = or :
+  const overAllScoreMatch    = clean.match(/overall\s+score\s*[=:]\s*(\d+)/i);
+  const relevanceScoreMatch  = clean.match(/relevance\s+score\s*[=:]\s*(\d+)/i);
+  const clarityScoreMatch    = clean.match(/clarity\s+score\s*[=:]\s*(\d+)/i);
+  const completenessScoreMatch = clean.match(/completeness\s+score\s*[=:]\s*(\d+)/i);
+  const suggestionsMatch     = clean.match(/suggestions?\s*[=:]\s*(.*)/i);
 
   return {
     overallScore: parseInt(overAllScoreMatch?.[1] ?? "0"),
-    relevance: parseInt(relevanceScoreMatch?.[1] ?? "0"),
-    clarity: parseInt(clarityScoreMatch?.[1] ?? "0"),
+    relevance:    parseInt(relevanceScoreMatch?.[1] ?? "0"),
+    clarity:      parseInt(clarityScoreMatch?.[1] ?? "0"),
     completeness: parseInt(completenessScoreMatch?.[1] ?? "0"),
-    suggestion: suggestionsMatch?.[1] ?? "",
+    suggestion:   suggestionsMatch?.[1]?.trim() ?? "",
   };
 }
 
