@@ -33,3 +33,17 @@ export const getTotalPages = (
 ) => {
   return Math.ceil(totalQuestions / questionsPerPage);
 };
+
+export const updateSearchParams = (
+  queryParams: URLSearchParams,
+  key: string,
+  value: string
+) => {
+  if (queryParams.has(key)) {
+    queryParams.set(key, value);
+  } else {
+    queryParams.append(key, value);
+  }
+
+  return queryParams;
+};

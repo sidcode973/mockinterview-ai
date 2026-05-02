@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request){
     const res = await getInterviews(request)  ;
     
-    const interviews = 'interviews' in res ? res.interviews : [] ;
+    const { interviews = [], resPerPage = 0, filteredCount = 0 } = 'interviews' in res ? res : {};
 
-    return NextResponse.json({ interviews }) ;
+    return NextResponse.json({ interviews, resPerPage, filteredCount }) ;
 }

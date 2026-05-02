@@ -1,9 +1,7 @@
 "use client";
 
 import React from "react";
-
 import { IInterview } from "@/backend/models/interview-model";
-
 import {
   Table,
   TableHeader,
@@ -17,11 +15,14 @@ import {
 import { Icon } from "@iconify/react";
 import { Key } from "@react-types/shared";
 import Link from "next/link";
-import { calculateAverageScore } from "@/helpers/interview";
+import CustomPagination from "../layout/pagination/CustomPagination";
+import StatusFilter from "../layout/filter/StatusFilter";
 
 type Props = {
   data: {
     interviews: IInterview[];
+    resPerPage: number;
+    filteredCount: number;
   };
 };
 
@@ -33,7 +34,7 @@ export const columns = [
 ];
 
 const ListResults = ({ data }: Props) => {
-  const { interviews } = data;
+  const { interviews, resPerPage, filteredCount } = data;
 
   const renderCell = React.useCallback(
     (interview: IInterview, columnKey: Key): React.ReactNode => {
@@ -43,8 +44,10 @@ const ListResults = ({ data }: Props) => {
         case "interview":
           return (
             <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">{interview?.topic}</p>
-              <p className="text-bold text-sm capitalize text-default-400">
+              <p className="font-medium text-default-800 capitalize">
+                {interview?.topic}
+              </p>
+              <p className="text-xs text-default-400 mt-0.5 capitalize">
                 {interview?.type}
               </p>
             </div>
@@ -63,22 +66,20 @@ const ListResults = ({ data }: Props) => {
         case "status":
           return (
             <Chip
-              className="capitalize"
-              color={interview?.status === "completed" ? "success" : "danger"}
+              className="capitalize text-xs font-medium"
+              color={interview?.status === "completed" ? "success" : "warning"}
               size="sm"
               variant="flat"
             >
-              {String(cellValue ?? "")}
+              {interview?.status}
             </Chip>
           );
         case "actions":
           return interview?.status === "completed" ? (
             <Button
-              className="bg-foreground font-medium text-background"
-              color="secondary"
-              endContent={
-                <Icon icon="solar:arrow-right-linear" fontSize={20} />
-              }
+              size="sm"
+              className="bg-foreground text-background font-medium rounded-lg min-w-[120px]"
+              endContent={<Icon icon="solar:arrow-right-linear" fontSize={16} />}
               variant="flat"
               as={Link}
               href={`/app/results/${interview._id}`}
@@ -86,7 +87,9 @@ const ListResults = ({ data }: Props) => {
               View Result
             </Button>
           ) : (
-            <p>Complete Interview to view result.</p>
+            <p className="text-xs text-default-400">
+              Complete interview first
+            </p>
           );
         default:
           return cellValue == null ? null : String(cellValue);
@@ -97,27 +100,56 @@ const ListResults = ({ data }: Props) => {
 
   return (
     <div className="my-4">
-      <Table aria-label="Interivews table">
-        <TableHeader columns={columns}>
-          {(column) => (
-            <TableColumn
-              key={column.uid}
-              align={column.uid === "actions" ? "center" : "start"}
-            >
-              {column.name}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody items={interviews}>
-          {(item) => (
-            <TableRow key={item._id.toString()}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
+      {/* Filter bar */}
+      <div className="flex justify-end items-center mb-5">
+        <StatusFilter />
+      </div>
+
+      {interviews.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center rounded-xl border border-default-200/60 bg-default-50/30">
+          <Icon
+            icon="solar:clipboard-list-linear"
+            fontSize={48}
+            className="text-default-300 mb-4"
+          />
+          <p className="text-default-500 font-medium">No results found</p>
+          <p className="text-default-400 text-sm mt-1">
+            Complete an interview to see your results here
+          </p>
+        </div>
+      ) : (
+        <div className="rounded-xl border border-default-200/60 shadow-sm overflow-hidden">
+          <Table aria-label="Results table" removeWrapper>
+            <TableHeader columns={columns}>
+              {(column) => (
+                <TableColumn
+                  key={column.uid}
+                  align={column.uid === "actions" ? "center" : "start"}
+                  className="text-xs font-semibold text-default-500 uppercase tracking-wider bg-default-50/80"
+                >
+                  {column.name}
+                </TableColumn>
               )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            </TableHeader>
+            <TableBody items={interviews}>
+              {(item) => (
+                <TableRow key={item._id.toString()}>
+                  {(columnKey) => (
+                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
+      <div className="flex justify-center items-center mt-10">
+        <CustomPagination
+          resPerPage={resPerPage}
+          filteredCount={filteredCount}
+        />
+      </div>
     </div>
   );
 };
