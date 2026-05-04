@@ -9,6 +9,7 @@ import {
 import { Icon } from "@iconify/react";
 import { IUser } from "@/backend/models/user-model";
 import { signOut, useSession } from "next-auth/react";
+import { isUserAdmin, isUserSubscribed } from "@/helpers/auth";
 
 const HeaderUser = ({ user }: { user: IUser }) => {
   const { data } = useSession();
@@ -51,6 +52,7 @@ const HeaderUser = ({ user }: { user: IUser }) => {
             <p className="font-bold">Signed in as</p>
             <p className="font-bold">{user?.email}</p>
           </DropdownItem>
+         { isUserAdmin(user) ? (
           <DropdownItem
             key="admin_dashboard"
             href="/admin/dashboard"
@@ -58,6 +60,9 @@ const HeaderUser = ({ user }: { user: IUser }) => {
           >
             Admin Dashboard
           </DropdownItem>
+          ) : null }
+
+          { isUserAdmin(user) || isUserSubscribed(user) ? (
           <DropdownItem
             key="app_dashboard"
             href="/app/dashboard"
@@ -65,6 +70,7 @@ const HeaderUser = ({ user }: { user: IUser }) => {
           >
             App Dashboard
           </DropdownItem>
+          ) : null }
           <DropdownItem
             key="logout"
             color="danger"
