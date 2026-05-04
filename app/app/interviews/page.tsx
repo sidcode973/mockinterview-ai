@@ -3,13 +3,12 @@ import { getAuthHeader } from "@/helpers/auth";
 import { cookies } from "next/headers";
 import React from "react";
 
-async function getInterviews( searchParams?: string  ) {
+async function getInterviews(searchParams?: string) {
   try {
-    const  urlParams = new URLSearchParams(searchParams);
-    const queryStr = urlParams.toString() ;
-    
     const nextCookies = await cookies();
     const authHeader = getAuthHeader(nextCookies);
+
+    const queryStr = searchParams ?? "";
 
     const response = await fetch(
       `${process.env?.API_URL}/api/auth/interviews?${queryStr}`,

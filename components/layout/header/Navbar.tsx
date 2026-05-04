@@ -19,6 +19,7 @@ import { siteConfig } from "@/config/site";
 import { signOut, useSession } from "next-auth/react";
 import { IUser } from "@/backend/models/user-model";
 import { useState } from "react";
+import { isUserAdmin, isUserSubscribed } from "@/helpers/auth";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -52,14 +53,16 @@ const Navbar = () => {
         {data?.user ? (
           <>
             <NavbarItem className="hidden sm:flex">
+              {!isUserSubscribed(user) && (  
               <Button
                 size="sm"
-                className="bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-medium rounded-full px-5"
+                className="bg-linear-to-r from-violet-600 to-fuchsia-600 text-white font-medium rounded-full px-5"
                 as={Link}
                 href="/subscribe"
               >
                 Subscribe for $9.99
               </Button>
+              )}
             </NavbarItem>
             <NavbarItem className="hidden sm:flex">
               <HeaderUser user={user} />
@@ -109,7 +112,7 @@ const Navbar = () => {
           )
         )}
       </NavbarContent>
-
+    
       <NavbarMenu className="pt-16">
         <User
           as="button"
@@ -123,6 +126,7 @@ const Navbar = () => {
           description={user?.email}
           name={user?.name}
         />
+        { isUserAdmin(user)  ? (
         <NavbarMenuItem>
           <Link
             color={"foreground"}
@@ -134,7 +138,9 @@ const Navbar = () => {
             <Icon icon="tabler:user-cog" /> Admin Dashboard
           </Link>
         </NavbarMenuItem>
+        ) : null }
 
+        { isUserAdmin(user) || isUserSubscribed(user) ? (
         <NavbarMenuItem>
           <Link
             color={"foreground"}
@@ -146,6 +152,7 @@ const Navbar = () => {
             <Icon icon="hugeicons:ai-brain-04" /> App Dashboard
           </Link>
         </NavbarMenuItem>
+        ) : null }
 
         <NavbarMenuItem>
           <Link

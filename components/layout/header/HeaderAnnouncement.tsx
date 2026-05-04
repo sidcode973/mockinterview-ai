@@ -1,9 +1,21 @@
 "use client";
 
+import { IUser } from "@/backend/models/user-model";
+import { isUserSubscribed } from "@/helpers/auth";
 import { Button, Link } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { useSession } from "next-auth/react";
 
-export default function HeaderAccouncement() {
+export default function HeaderAnnouncement() {
+  const { data, status } = useSession();
+  const user = data?.user as IUser;
+
+  // Wait until session is resolved
+  if (status === "loading") return null;
+
+  // Already subscribed — no announcement needed
+  if (isUserSubscribed(user)) return null;
+
   return (
     <div className="flex w-full items-center justify-center gap-x-3 border-b-1 border-divider bg-background/[0.15] px-6 py-2 backdrop-blur-xl sm:px-3.5">
       <p className="text-small text-foreground">

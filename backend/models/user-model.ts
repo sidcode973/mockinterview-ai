@@ -17,14 +17,14 @@ export interface IUser extends Document {
     provider: string;
     providerId: string;
   }[];
-  subscription: {
-    id: string;
-    customerId: string;
-    created: Date;
-    status: string;
-    startDate: Date;
-    currentPeriodEnd: Date;
-    nextPaymentAttempt: Date;
+  subscription?: {
+    id?: string;
+    customerId?: string;
+    created?: Date;
+    status?: string;
+    startDate?: Date;
+    currentPeriodEnd?: Date;
+    nextPaymentAttempt?: Date | null;
   };
   resetPasswordToken?: string;      
   resetPasswordExpire?: Date;       

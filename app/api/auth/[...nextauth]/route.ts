@@ -24,6 +24,10 @@ interface ExtendedProfile extends Profile {
 declare module "next-auth" {
   interface Session {
     provider?: string;
+    subscription?: {
+      id?: string;
+      status?: string;
+    };
   }
 }
 
@@ -161,21 +165,30 @@ const options = {
       user,
       account,
       trigger,
+      session,
     }: {
       token: JWT;
       user?: ExtendedUser;
       account?: Account | null;
       trigger?: string;
+      session?: Session;
+
     }) {
 
-      // First sign-in
+      // First sign-in — capture provider/image, then ALWAYS refresh user from DB
+      // so the JWT carries the freshest subscription state from the start.
       if (user) {
-        token.user     = user;
         token.provider = account?.provider ?? "credentials";
         token.image    = user?.image ?? (user as ExtendedUser)?.profilePicture?.url ?? "";
+
+        await dbConnect();
+        const userId = (user as ExtendedUser)?._id ?? (user as ExtendedUser)?.id;
+        const freshUser = userId ? await User.findById(userId) : null;
+        token.user = freshUser ?? user;
       }
 
-      // Subsequent requests — refresh from DB
+      // Subsequent requests — refresh from DB so subscription updates from the
+      // webhook (or other tabs) propagate without requiring a re-login.
       if (!user && token.user) {
         await dbConnect();
 
@@ -192,7 +205,7 @@ const options = {
         }
       }
 
-      // Profile update trigger
+      // Profile / subscription update trigger
       if (trigger === "update") {
         const u = token.user as ExtendedUser;
         const id = u?._id ?? u?.id;
@@ -203,6 +216,18 @@ const options = {
           const updatedUser = await User.findById(id);
 
           if (updatedUser) {
+            // If the client passed a partial subscription patch, merge it onto the
+            // DB doc instead of replacing — keeps customerId/dates intact.
+            if (session?.subscription) {
+              const existing =
+                (updatedUser.subscription as unknown as Record<string, unknown>) ??
+                {};
+              updatedUser.subscription = {
+                ...existing,
+                ...session.subscription,
+              } as typeof updatedUser.subscription;
+            }
+
             token.user = updatedUser;
 
             if (!updatedUser.profilePicture?.url && token.image) {
