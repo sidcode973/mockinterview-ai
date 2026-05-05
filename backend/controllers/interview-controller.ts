@@ -1,4 +1,5 @@
 
+import mongoose from "mongoose";
 import dbConnect from "../config/dbconnect";
 import { generateQuestions, evaluateAnswer } from "../GoogleGenAI/GoogleGenAI";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors";
@@ -7,6 +8,15 @@ import { InterviewBody } from "../types/interview-types";
 import APIFilters from "../utils/apiFilters";
 import { getCurrentUser } from "../utils/auth";
 import { getQueryStr } from "../utils/utils";
+import { getFirstDayOfMonth, getToday } from "../../helpers/helper";
+
+type DateSpecificStat = {
+  date: string;
+  totalInterviews: number;
+  completionRate: number;
+  unansweredQuestions: number;
+  completedQuestions: number;
+};
 
 
 
@@ -174,3 +184,155 @@ export const updateInterviewDetails = catchAsyncErrors(
     return { updated: true };
   }
 );
+
+export const getInterviewStats = catchAsyncErrors(async (req: Request) => {
+  await dbConnect();
+
+  const user = await getCurrentUser(req);
+
+  const { searchParams } = new URL(req.url);
+  const queryStr = getQueryStr(searchParams);
+
+  const start = new Date(queryStr.start || getFirstDayOfMonth());
+  const end = new Date(queryStr.end || getToday());
+
+  start.setHours(0, 0, 0, 0);
+  end.setHours(23, 59, 59, 999);
+
+  const stats = await Interview.aggregate([
+    // Filter data
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(user?._id),
+        createdAt: { $gte: start, $lte: end },
+      },
+    },
+    {
+      $facet: {
+        dateSpecific: [
+          {
+            $group: {
+              _id: {
+                $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+              },
+              totalInterviews: { $sum: 1 },
+              completedInterviews: {
+                $sum: {
+                  $cond: [{ $eq: ["$status", "completed"] }, 1, 0],
+                },
+              },
+              unansweredQuestions: {
+                $sum: {
+                  $reduce: {
+                    input: "$questions",
+                    initialValue: 0,
+                    in: {
+                      $add: [
+                        "$$value",
+                        {
+                          $cond: [{ $eq: ["$$this.completed", false] }, 1, 0],
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+              completedQuestions: {
+                $sum: {
+                  $reduce: {
+                    input: "$questions",
+                    initialValue: 0,
+                    in: {
+                      $add: [
+                        "$$value",
+                        {
+                          $cond: [{ $eq: ["$$this.completed", true] }, 1, 0],
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              date: "$_id",
+              totalInterviews: 1,
+              completionRate: {
+                $multiply: [
+                  { $divide: ["$completedInterviews", "$totalInterviews"] },
+                  100,
+                ],
+              },
+              unansweredQuestions: 1,
+              completedQuestions: 1,
+            },
+          },
+        ],
+        overallStats: [
+          {
+            $group: {
+              _id: null,
+              totalInterviews: { $sum: 1 },
+              completedInterviews: {
+                $sum: {
+                  $cond: [{ $eq: ["$status", "completed"] }, 1, 0],
+                },
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              totalInterviews: 1,
+              overallCompletionRate: {
+                $multiply: [
+                  { $divide: ["$completedInterviews", "$totalInterviews"] },
+                  100,
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+    {
+      $project: {
+        dateSpecific: 1,
+        overallStats: { $arrayElemAt: ["$overallStats", 0] },
+      },
+    },
+  ]);
+
+  if (!stats?.length) {
+    return {
+      overallStats: {
+        totalInterviews: 0,
+        overallCompletionRate: 0,
+      },
+      stats: [],
+    };
+  }
+
+  const overallStats = stats[0].overallStats || {
+    totalInterviews: 0,
+    overallCompletionRate: 0,
+  };
+  const dateSpecificStats = stats[0].dateSpecific || [];
+
+  const formattedStats = {
+    totalInterviews: overallStats.totalInterviews,
+    completionRate: overallStats.overallCompletionRate?.toFixed(2),
+    stats: dateSpecificStats?.map((stat: DateSpecificStat) => ({
+      date: stat?.date,
+      totalInterviews: stat?.totalInterviews || 0,
+      completionRate: stat?.completionRate?.toFixed(2),
+      completedQuestion: stat?.completedQuestions || 0,
+      unasweredQuestion: stat?.unansweredQuestions || 0,
+    })),
+  };
+
+  return formattedStats;
+});

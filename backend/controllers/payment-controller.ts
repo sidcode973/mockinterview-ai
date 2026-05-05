@@ -4,6 +4,7 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors";
 import stripe from "../utils/stripe";
 import User from "../models/user-model";
 import dbConnect from "../config/dbconnect";
+import { getCurrentUser } from "../utils/auth";
 
 export const createSubscription = catchAsyncErrors(
   async (email: string, paymentMethodId: string) => {
@@ -210,3 +211,24 @@ export const subscriptionWebhook = async (req: Request) => {
 
   return { success: true };
 };
+
+
+export const getInvoices = catchAsyncErrors(async (req: Request) => {
+  await dbConnect();
+
+  const user = await getCurrentUser(req);
+
+  if (!user?.subscription?.id) {
+    return {
+      invoices: [],
+    };
+  }
+
+  const invoices = await stripe.invoices.list({
+    customer: user?.subscription?.customerId,
+  });
+
+  return {
+    invoices: invoices.data,
+  };
+});
