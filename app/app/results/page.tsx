@@ -14,7 +14,7 @@ async function getInterviews(searchParams?: string) {
     const authHeader = getAuthHeader(nextCookies);
 
     const response = await fetch(
-      `${process.env?.API_URL}/api/auth/interviews?${queryStr}`,
+      `${process.env?.API_URL}/api/interviews?${queryStr}`,
       authHeader
     );
 

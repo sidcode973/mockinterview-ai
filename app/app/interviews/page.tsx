@@ -11,7 +11,7 @@ async function getInterviews(searchParams?: string) {
     const queryStr = searchParams ?? "";
 
     const response = await fetch(
-      `${process.env?.API_URL}/api/auth/interviews?${queryStr}`,
+      `${process.env?.API_URL}/api/interviews?${queryStr}`,
       authHeader
     );
 
