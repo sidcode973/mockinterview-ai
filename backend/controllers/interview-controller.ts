@@ -64,7 +64,7 @@ export const createInterview = catchAsyncErrors(async (body: InterviewBody) => {
       })();
 });
 
-export const getInterviews = catchAsyncErrors(async (request: Request) => {
+export const getInterviews = catchAsyncErrors(async (request: Request ,  admin?: string) => {
   await dbConnect();
 
 const user = await getCurrentUser(request);
@@ -74,7 +74,10 @@ const user = await getCurrentUser(request);
   const { searchParams } = new URL(request.url);
   const queryStr = getQueryStr(searchParams);
 
-  queryStr.user = user?._id?.toString();
+  if (!admin) {
+    queryStr.user = user?._id?.toString();
+  }
+
 
   const apiFilters = new APIFilters(Interview, queryStr).filter();
 
@@ -185,7 +188,7 @@ export const updateInterviewDetails = catchAsyncErrors(
   }
 );
 
-export const getInterviewStats = catchAsyncErrors(async (req: Request) => {
+export const getInterviewStats = catchAsyncErrors(async (req: Request ) => {
   await dbConnect();
 
   const user = await getCurrentUser(req);

@@ -15,12 +15,13 @@ import {
 import { Icon } from "@iconify/react";
 import { IInterview } from "@/backend/models/interview-model";
 import { Key } from "@react-types/shared";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { deleteInterview } from "@/actions/interview-actions";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import CustomPagination from "../layout/pagination/CustomPagination";
 import StatusFilter from "../layout/filter/StatusFilter";
+import { isAdminPath } from "@/helpers/auth";
 
 export const columns = [
   { name: "INTERVIEW", uid: "interview" },
@@ -42,6 +43,8 @@ export default function ListInterviews({ data }: ListInterviewProps) {
 
   const router = useRouter();
 
+  const pathName = usePathname();
+
   const deleteInterviewHandler = React.useCallback(
     async (interviewId: string) => {
       const res = await deleteInterview(interviewId);
@@ -53,10 +56,15 @@ export default function ListInterviews({ data }: ListInterviewProps) {
 
       if (res && "deleted" in res && res.deleted) {
         toast.success("Interview deleted successfully");
-        router.push("/app/interviews");
+
+        if (isAdminPath(pathName)) {
+          router.push("/admin/interviews");
+        } else {
+          router.push("/app/interviews");
+        }
       }
     },
-    [router]
+    [pathName, router]
   );
 
   const renderCell = React.useCallback(
@@ -101,7 +109,8 @@ export default function ListInterviews({ data }: ListInterviewProps) {
           return (
             <>
               {interview?.answered === 0 &&
-              interview?.status !== "completed" ? (
+              interview?.status !== "completed" &&
+              !isAdminPath(pathName) ? (
                 <Button
                   size="sm"
                   className="bg-foreground text-background font-medium rounded-lg min-w-[100px]"
@@ -115,7 +124,7 @@ export default function ListInterviews({ data }: ListInterviewProps) {
                 </Button>
               ) : (
                 <div className="relative flex items-center justify-center gap-2">
-                  {interview?.status !== "completed" && (
+                  {interview?.status !== "completed" &&  !isAdminPath(pathName) && (
                     <Tooltip color="primary" content="Continue Interview">
                       <Button
                         isIconOnly
@@ -133,6 +142,26 @@ export default function ListInterviews({ data }: ListInterviewProps) {
                       </Button>
                     </Tooltip>
                   )}
+
+                  {interview?.status === "completed" && (
+                    <Tooltip color="primary" content="View Results">
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        color="primary"
+                        onPress={() =>
+                          router.push(`/app/results/${interview._id}`)
+                        }
+                      >
+                        <Icon
+                          icon="solar:round-double-alt-arrow-right-bold"
+                          fontSize={20}
+                        />
+                      </Button>
+                    </Tooltip>
+                  )}
+
                   <Tooltip color="danger" content="Delete Interview">
                     <Button
                       isIconOnly
@@ -157,7 +186,7 @@ export default function ListInterviews({ data }: ListInterviewProps) {
           return String(cellValue ?? "");
       }
     },
-    [deleteInterviewHandler, router]
+    [deleteInterviewHandler, pathName, router]
   );
 
   return (

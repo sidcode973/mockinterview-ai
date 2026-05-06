@@ -3,6 +3,8 @@ import { getAuthHeader } from "@/helpers/auth";
 import { cookies } from "next/headers";
 import React from "react";
 
+export const dynamic = "force-dynamic";
+
 async function getInvoices() {
   try {
     const nextCookies = await cookies();
