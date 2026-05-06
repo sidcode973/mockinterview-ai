@@ -1,4 +1,4 @@
-import Dashboard from "@/components/dashboard/Dashboard";
+import Dashboard from "@/components/admin/dashboard/Dashboard";
 import { getAuthHeader } from "@/helpers/auth";
 import { cookies } from "next/headers";
 import React from "react";
@@ -11,7 +11,7 @@ async function getDashboardStats(queryStr: string) {
     const authHeader = getAuthHeader(nextCookies);
 
     const response = await fetch(
-      `${process.env?.API_URL}/api/dashboard/stats?${queryStr}`,
+      `${process.env?.API_URL}/api/admin/stats?${queryStr}`,
       authHeader
     );
 
@@ -23,12 +23,12 @@ async function getDashboardStats(queryStr: string) {
     return data;
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Failed to load dashboard";
+      error instanceof Error ? error.message : "Failed to load admin stats";
     throw new Error(message);
   }
 }
 
-const DashboardPage = async ({
+const AdminDashboardPage = async ({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
@@ -46,4 +46,4 @@ const DashboardPage = async ({
   return <Dashboard data={data?.data} />;
 };
 
-export default DashboardPage;
+export default AdminDashboardPage;

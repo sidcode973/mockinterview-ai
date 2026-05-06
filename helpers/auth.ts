@@ -40,3 +40,7 @@ export const isUserSubscribed = (user: IUser): boolean => {
 
   return true;
 };
+
+export const isAdminPath = (pathname: string): boolean => {
+  return pathname.includes("/admin");
+};

@@ -1,17 +1,20 @@
-import Dashboard from "@/components/dashboard/Dashboard";
+import ListInterviews from "@/components/interview/ListInterviews";
 import { getAuthHeader } from "@/helpers/auth";
 import { cookies } from "next/headers";
 import React from "react";
 
 export const dynamic = "force-dynamic";
 
-async function getDashboardStats(queryStr: string) {
+async function getInterviews(searchParams: string) {
   try {
+    const urlParams = new URLSearchParams(searchParams);
+    const queryStr = urlParams.toString();
+
     const nextCookies = await cookies();
     const authHeader = getAuthHeader(nextCookies);
 
     const response = await fetch(
-      `${process.env?.API_URL}/api/dashboard/stats?${queryStr}`,
+      `${process.env?.API_URL}/api/admin/interviews?${queryStr}`,
       authHeader
     );
 
@@ -21,29 +24,25 @@ async function getDashboardStats(queryStr: string) {
 
     const data = await response.json();
     return data;
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Failed to load dashboard";
-    throw new Error(message);
+  } catch (error: unknown) {
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to load interviews"
+    );
   }
 }
 
-const DashboardPage = async ({
+const InterviewsPage = async ({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) => {
   const params = await searchParams;
   const queryStr = new URLSearchParams(
-    Object.entries(params).filter(([, v]) => v !== undefined) as [
-      string,
-      string
-    ][]
+    Object.entries(params).filter(([, v]) => v !== undefined) as [string, string][]
   ).toString();
 
-  const data = await getDashboardStats(queryStr);
-
-  return <Dashboard data={data?.data} />;
+  const data = await getInterviews(queryStr);
+  return <ListInterviews data={data} />;
 };
 
-export default DashboardPage;
+export default InterviewsPage;

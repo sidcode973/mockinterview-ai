@@ -116,15 +116,16 @@ const CircleChartCard: React.FC<CircleChartProps> = ({
 }) => {
   return (
     <Card
+      aria-label={title}
       className={cn(
         "h-55 border border-transparent dark:border-default-100"
       )}
       {...props}
     >
-      <div className="flex h-full gap-x-3">
+      <div className="flex min-h-[176px] w-full flex-1 gap-x-3">
         <ResponsiveContainer
           className="[&_.recharts-surface]:outline-none"
-          height="100%"
+          height={176}
           width="100%"
         >
           <RadialBarChart

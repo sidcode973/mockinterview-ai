@@ -96,7 +96,10 @@ const CircleChartCard = React.forwardRef<
   return (
     <Card
       ref={ref}
-      className={cn("dark:border-default-100 h-[240px] border border-transparent", className)}
+      className={cn(
+        "flex h-[240px] flex-col border border-transparent dark:border-default-100",
+        className
+      )}
       {...props}
     >
       <div className="flex flex-col gap-y-2 p-4 pb-0">
@@ -130,10 +133,10 @@ const CircleChartCard = React.forwardRef<
           </div>
         </div>
       </div>
-      <div className="flex h-full gap-x-3">
+      <div className="flex min-h-[176px] w-full flex-1 gap-x-3">
         <ResponsiveContainer
           className="[&_.recharts-surface]:outline-hidden"
-          height="100%"
+          height={176}
           width="100%"
         >
           <RadialBarChart
