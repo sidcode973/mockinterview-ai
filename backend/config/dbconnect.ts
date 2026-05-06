@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
 
-// Choose DB URI based on environment (development vs production)
-const MONGODB_URI =
-  process.env.NODE_ENV === "development"
-    ? process.env.MONGODB_URI_LOCAL!
-    : process.env.MONGODB_URI!;
-
+const MONGODB_URI = process.env.MONGODB_URI!;
 // Throw error if URI is missing
 if (!MONGODB_URI) {
   throw new Error("No MONGODB_URI provided");
