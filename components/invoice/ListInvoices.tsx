@@ -33,7 +33,7 @@ const formatDate = (unixSeconds: number | undefined | null): string => {
 export const columns = [
   { name: "INVOICE", uid: "invoice" },
   { name: "BILL PAID", uid: "bill" },
-  { name: "BILLING DATE", uid: "date" },
+  { name: "DATE", uid: "date" },
   { name: "ACTIONS", uid: "actions" },
 ];
 
@@ -70,12 +70,10 @@ const ListInvoices = ({ invoices }: Props) => {
             </Chip>
           );
 
-        case "date": {
-          const periodEnd = invoice?.lines?.data?.[0]?.period?.end;
+        case "date":
           return (
-            <p className="text-sm text-default-600">{formatDate(periodEnd)}</p>
+            <p className="text-sm text-default-600">{formatDate(invoice?.created)}</p>
           );
-        }
 
         case "actions":
           return (
