@@ -158,7 +158,24 @@ const CheckoutForm = () => {
               isDisabled
             />
             <div className="rounded-xl border border-default-200/60 bg-default-50/40 px-4 py-3">
-              <CardElement options={{ hidePostalCode: true }} />
+              <CardElement
+                options={{
+                  hidePostalCode: true,
+                  style: {
+                    base: {
+                      color: "#ffffff",
+                      fontFamily: "'Geist', system-ui, sans-serif",
+                      fontSize: "15px",
+                      "::placeholder": { color: "#94a3b8" },
+                      iconColor: "#c084fc",
+                    },
+                    invalid: {
+                      color: "#f87171",
+                      iconColor: "#f87171",
+                    },
+                  },
+                }}
+              />
             </div>
             <MagneticButton strength={0.25} className="w-full block">
               <Button
