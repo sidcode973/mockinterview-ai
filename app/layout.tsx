@@ -4,6 +4,10 @@ import "./globals.css";
 import { Providers } from "./providers";
 import Footer from "@/components/layout/footer/Footer";
 import Navbar from "@/components/layout/header/Navbar";
+import AuroraBackground from "@/components/visual/AuroraBackground";
+import NoiseOverlay from "@/components/visual/NoiseOverlay";
+import PageTransition from "@/components/ui/PageTransition";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -30,13 +34,15 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          
+          <AuroraBackground variant="muted" />
+          <NoiseOverlay opacity={0.04} />
+
           <div className="relative flex flex-col min-h-screen">
-            <Navbar/>
-              <main className="container mx-auto max-w-7xl pt-7 px-6 flex-1 flex flex-col">
-                 {children}
-              </main>
-            <Footer/>
+            <Navbar />
+            <main className="container mx-auto max-w-7xl pt-7 px-6 flex-1 flex flex-col">
+              <PageTransition>{children}</PageTransition>
+            </main>
+            <Footer />
           </div>
         </Providers>
       </body>

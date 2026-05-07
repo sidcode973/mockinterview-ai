@@ -17,6 +17,8 @@ import { Key } from "@react-types/shared";
 import Link from "next/link";
 import CustomPagination from "../layout/pagination/CustomPagination";
 import StatusFilter from "../layout/filter/StatusFilter";
+import GlassCard from "../ui/GlassCard";
+import MotionFadeIn from "../ui/motion/MotionFadeIn";
 
 type Props = {
   data: {
@@ -44,7 +46,7 @@ const ListResults = ({ data }: Props) => {
         case "interview":
           return (
             <div className="flex flex-col">
-              <p className="font-medium text-default-800 capitalize">
+              <p className="font-medium text-foreground capitalize">
                 {interview?.topic}
               </p>
               <p className="text-xs text-default-400 mt-0.5 capitalize">
@@ -55,7 +57,7 @@ const ListResults = ({ data }: Props) => {
         case "result":
           return (
             <div className="flex flex-col">
-              <p className="font-semibold text-default-800">
+              <p className="font-semibold text-foreground">
                 {interview?.answered} / {interview?.numOfQuestions}
               </p>
               <p className="text-xs text-default-400 mt-0.5">
@@ -78,9 +80,8 @@ const ListResults = ({ data }: Props) => {
           return interview?.status === "completed" ? (
             <Button
               size="sm"
-              className="bg-foreground text-background font-medium rounded-lg min-w-[120px]"
+              className="bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white font-medium rounded-lg min-w-[120px] shadow-md shadow-fuchsia-500/20"
               endContent={<Icon icon="solar:arrow-right-linear" fontSize={16} />}
-              variant="flat"
               as={Link}
               href={`/app/results/${interview._id}`}
             >
@@ -100,48 +101,51 @@ const ListResults = ({ data }: Props) => {
 
   return (
     <div className="my-4">
-      {/* Filter bar */}
       <div className="flex justify-end items-center mb-5">
         <StatusFilter />
       </div>
 
       {interviews.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center rounded-xl border border-default-200/60 bg-default-50/30">
-          <Icon
-            icon="solar:clipboard-list-linear"
-            fontSize={48}
-            className="text-default-300 mb-4"
-          />
-          <p className="text-default-500 font-medium">No results found</p>
-          <p className="text-default-400 text-sm mt-1">
-            Complete an interview to see your results here
-          </p>
-        </div>
+        <MotionFadeIn>
+          <GlassCard variant="soft" className="flex flex-col items-center justify-center py-20 text-center">
+            <Icon
+              icon="solar:clipboard-list-linear"
+              fontSize={48}
+              className="text-default-300 mb-4"
+            />
+            <p className="text-default-500 font-medium">No results found</p>
+            <p className="text-default-400 text-sm mt-1">
+              Complete an interview to see your results here
+            </p>
+          </GlassCard>
+        </MotionFadeIn>
       ) : (
-        <div className="rounded-xl border border-default-200/60 shadow-sm overflow-hidden">
-          <Table aria-label="Results table" removeWrapper>
-            <TableHeader columns={columns}>
-              {(column) => (
-                <TableColumn
-                  key={column.uid}
-                  align={column.uid === "actions" ? "center" : "start"}
-                  className="text-xs font-semibold text-default-500 uppercase tracking-wider bg-default-50/80"
-                >
-                  {column.name}
-                </TableColumn>
-              )}
-            </TableHeader>
-            <TableBody items={interviews}>
-              {(item) => (
-                <TableRow key={item._id.toString()}>
-                  {(columnKey) => (
-                    <TableCell>{renderCell(item, columnKey)}</TableCell>
-                  )}
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        <MotionFadeIn>
+          <GlassCard variant="soft" className="overflow-hidden">
+            <Table aria-label="Results table" removeWrapper>
+              <TableHeader columns={columns}>
+                {(column) => (
+                  <TableColumn
+                    key={column.uid}
+                    align={column.uid === "actions" ? "center" : "start"}
+                    className="text-xs font-semibold text-default-500 uppercase tracking-wider bg-default-100/30"
+                  >
+                    {column.name}
+                  </TableColumn>
+                )}
+              </TableHeader>
+              <TableBody items={interviews}>
+                {(item) => (
+                  <TableRow key={item._id.toString()}>
+                    {(columnKey) => (
+                      <TableCell>{renderCell(item, columnKey)}</TableCell>
+                    )}
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </GlassCard>
+        </MotionFadeIn>
       )}
 
       <div className="flex justify-center items-center mt-10">

@@ -6,6 +6,7 @@ import { ThemeProvider } from 'next-themes'
 import { SessionProvider } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Toaster } from 'react-hot-toast'
+import { LazyMotion, domAnimation } from 'framer-motion'
 
 interface ProvidersProps {
   children: React.ReactNode
@@ -17,13 +18,15 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   const router = useRouter();
 
   return (
-    <HeroUIProvider navigate={router.push}>  
+    <HeroUIProvider navigate={router.push}>
       <ThemeProvider {...themeProps}>
         <SessionProvider>
-          <Toaster position="top-center" containerStyle={{ zIndex: 9999 }} />
-          {children}
-        </SessionProvider>   
-      </ThemeProvider>         
+          <LazyMotion features={domAnimation} strict>
+            <Toaster position="top-center" containerStyle={{ zIndex: 9999 }} />
+            {children}
+          </LazyMotion>
+        </SessionProvider>
+      </ThemeProvider>
     </HeroUIProvider>
   )
 }

@@ -14,6 +14,9 @@ import { useRouter } from "next/navigation";
 import { IUser } from "@/backend/models/user-model";
 import toast from "react-hot-toast";
 import { newInterview } from "@/actions/interview-actions";
+import GlassCard from "../ui/GlassCard";
+import MagneticButton from "../ui/MagneticButton";
+import MotionFadeIn from "../ui/motion/MotionFadeIn";
 
 const interviewIndustries = Object.keys(industryTopics);
 
@@ -61,9 +64,11 @@ export default function NewInterview() {
     <div className="max-w-3xl mx-auto">
       <Form validationBehavior="native" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-          <div className="col-span-1">
-            <div className="bg-default-50/50 rounded-xl p-6 border border-default-200/60">
-              <h3 className="text-sm font-semibold text-default-600 uppercase tracking-wider mb-4">Interview Setup</h3>
+          <MotionFadeIn className="col-span-1">
+            <GlassCard variant="soft" className="p-6">
+              <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-gradient-fusion">
+                Interview Setup
+              </h3>
               <div className="flex flex-col gap-4 w-full">
                 <Select
                   isRequired
@@ -75,9 +80,7 @@ export default function NewInterview() {
                   variant="bordered"
                 >
                   {interviewIndustries?.map((industry) => (
-                    <SelectItem key={industry}>
-                      {industry}
-                    </SelectItem>
+                    <SelectItem key={industry}>{industry}</SelectItem>
                   ))}
                 </Select>
 
@@ -91,9 +94,7 @@ export default function NewInterview() {
                   variant="bordered"
                 >
                   {topics?.map((topic) => (
-                    <SelectItem key={topic}>
-                      {topic}
-                    </SelectItem>
+                    <SelectItem key={topic}>{topic}</SelectItem>
                   ))}
                 </Select>
 
@@ -106,9 +107,7 @@ export default function NewInterview() {
                   variant="bordered"
                 >
                   {interviewTypes?.map((type) => (
-                    <SelectItem key={type}>
-                      {type}
-                    </SelectItem>
+                    <SelectItem key={type}>{type}</SelectItem>
                   ))}
                 </Select>
 
@@ -122,12 +121,14 @@ export default function NewInterview() {
                   variant="bordered"
                 />
               </div>
-            </div>
-          </div>
+            </GlassCard>
+          </MotionFadeIn>
 
-          <div className="col-span-1">
-            <div className="bg-default-50/50 rounded-xl p-6 border border-default-200/60">
-              <h3 className="text-sm font-semibold text-default-600 uppercase tracking-wider mb-4">Preferences</h3>
+          <MotionFadeIn delay={0.1} className="col-span-1">
+            <GlassCard variant="soft" className="p-6">
+              <h3 className="text-sm font-semibold uppercase tracking-wider mb-4 text-gradient-cyan">
+                Preferences
+              </h3>
               <div className="flex flex-col gap-4 w-full">
                 <Select
                   isRequired
@@ -138,9 +139,7 @@ export default function NewInterview() {
                   variant="bordered"
                 >
                   {interviewDifficulties?.map((difficulty) => (
-                    <SelectItem key={difficulty}>
-                      {difficulty}
-                    </SelectItem>
+                    <SelectItem key={difficulty}>{difficulty}</SelectItem>
                   ))}
                 </Select>
 
@@ -164,24 +163,25 @@ export default function NewInterview() {
                   variant="bordered"
                 />
               </div>
-            </div>
-          </div>
+            </GlassCard>
+          </MotionFadeIn>
         </div>
 
         <div className="flex justify-end gap-3 mt-6 w-full">
           <Button type="reset" variant="flat" size="md">
             Reset
           </Button>
-          <Button
-            color="primary"
-            type="submit"
-            size="md"
-            className="px-8 font-medium"
-            isLoading={loading}
-            isDisabled={loading}
-          >
-            Create Interview
-          </Button>
+          <MagneticButton strength={0.25}>
+            <Button
+              type="submit"
+              size="md"
+              className="px-8 font-medium bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white shadow-lg shadow-fuchsia-500/30"
+              isLoading={loading}
+              isDisabled={loading}
+            >
+              Create Interview
+            </Button>
+          </MagneticButton>
         </div>
       </Form>
     </div>

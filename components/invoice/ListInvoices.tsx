@@ -18,9 +18,9 @@ import { Icon } from "@iconify/react";
 import { Key } from "@react-types/shared";
 import Link from "next/link";
 import { getTotalPages, paginate } from "@/helpers/helper";
+import GlassCard from "../ui/GlassCard";
+import MotionFadeIn from "../ui/motion/MotionFadeIn";
 
-// Locale-independent formatter so server and client always produce the same string
-// (avoids React hydration mismatches caused by toLocaleDateString()).
 const formatDate = (unixSeconds: number | undefined | null): string => {
   if (!unixSeconds) return "—";
   const d = new Date(unixSeconds * 1000);
@@ -51,7 +51,7 @@ const ListInvoices = ({ invoices }: Props) => {
         case "invoice":
           return (
             <div className="flex flex-col">
-              <p className="font-medium text-sm capitalize text-default-800">
+              <p className="font-medium text-sm capitalize text-foreground">
                 {invoice?.account_name ?? "—"}
               </p>
               <p className="text-xs text-default-400 mt-0.5">{invoice?.id}</p>
@@ -82,11 +82,8 @@ const ListInvoices = ({ invoices }: Props) => {
             <div className="relative flex items-center justify-center gap-2">
               <Button
                 size="sm"
-                className="bg-foreground font-medium text-background rounded-lg"
-                endContent={
-                  <Icon icon="solar:download-linear" fontSize={16} />
-                }
-                variant="flat"
+                className="bg-gradient-to-r from-fuchsia-500 to-cyan-500 font-medium text-white rounded-lg shadow-md shadow-fuchsia-500/20"
+                endContent={<Icon icon="solar:download-linear" fontSize={16} />}
                 as={Link}
                 href={invoice?.invoice_pdf || "#"}
                 target="_blank"
@@ -104,20 +101,21 @@ const ListInvoices = ({ invoices }: Props) => {
     []
   );
 
-  // Early return AFTER all hooks have been called — keeps rules-of-hooks happy.
   if (!invoices || invoices.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center rounded-xl border border-default-200/60 bg-default-50/30">
-        <Icon
-          icon="solar:bill-list-linear"
-          fontSize={48}
-          className="text-default-300 mb-4"
-        />
-        <p className="text-default-500 font-medium">No invoices yet</p>
-        <p className="text-default-400 text-sm mt-1">
-          Your billing history will appear here once you subscribe
-        </p>
-      </div>
+      <MotionFadeIn>
+        <GlassCard variant="soft" className="flex flex-col items-center justify-center py-20 text-center">
+          <Icon
+            icon="solar:bill-list-linear"
+            fontSize={48}
+            className="text-default-300 mb-4"
+          />
+          <p className="text-default-500 font-medium">No invoices yet</p>
+          <p className="text-default-400 text-sm mt-1">
+            Your billing history will appear here once you subscribe
+          </p>
+        </GlassCard>
+      </MotionFadeIn>
     );
   }
 
@@ -131,42 +129,46 @@ const ListInvoices = ({ invoices }: Props) => {
 
   return (
     <div className="my-4">
-      <div className="flex items-center justify-center w-full mb-5">
-        <Alert
-          title="Next Billing"
-          color="success"
-          description={`Your next billing of $${nextBillingAmount.toFixed(
-            2
-          )} for ${
-            lastInvoice?.account_name ?? "your subscription"
-          } will be on ${nextBillingDate}`}
-        />
-      </div>
+      <MotionFadeIn>
+        <div className="flex items-center justify-center w-full mb-5">
+          <Alert
+            title="Next Billing"
+            color="success"
+            description={`Your next billing of $${nextBillingAmount.toFixed(
+              2
+            )} for ${
+              lastInvoice?.account_name ?? "your subscription"
+            } will be on ${nextBillingDate}`}
+          />
+        </div>
+      </MotionFadeIn>
 
-      <div className="rounded-xl border border-default-200/60 shadow-sm overflow-hidden">
-        <Table aria-label="Invoices table" removeWrapper>
-          <TableHeader columns={columns}>
-            {(column) => (
-              <TableColumn
-                key={column.uid}
-                align={column.uid === "actions" ? "center" : "start"}
-                className="text-xs font-semibold text-default-500 uppercase tracking-wider bg-default-50/80"
-              >
-                {column.name}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody items={currentInvoices}>
-            {(item: Stripe.Invoice) => (
-              <TableRow key={item?.id}>
-                {(columnKey) => (
-                  <TableCell>{renderCell(item, columnKey)}</TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <MotionFadeIn delay={0.1}>
+        <GlassCard variant="soft" className="overflow-hidden">
+          <Table aria-label="Invoices table" removeWrapper>
+            <TableHeader columns={columns}>
+              {(column) => (
+                <TableColumn
+                  key={column.uid}
+                  align={column.uid === "actions" ? "center" : "start"}
+                  className="text-xs font-semibold text-default-500 uppercase tracking-wider bg-default-100/30"
+                >
+                  {column.name}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody items={currentInvoices}>
+              {(item: Stripe.Invoice) => (
+                <TableRow key={item?.id}>
+                  {(columnKey) => (
+                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </GlassCard>
+      </MotionFadeIn>
 
       <div className="flex justify-center items-center mt-10">
         <Pagination
@@ -176,11 +178,11 @@ const ListInvoices = ({ invoices }: Props) => {
           radius="lg"
           classNames={{
             wrapper: "gap-2",
-            item: "w-10 h-10 text-sm font-medium bg-default-100 hover:bg-default-200",
+            item: "w-10 h-10 text-sm font-medium bg-default-100/40 backdrop-blur-md hover:bg-default-200/50",
             cursor:
-              "w-10 h-10 text-sm font-bold bg-primary text-white shadow-md shadow-primary/40",
-            prev: "w-10 h-10 bg-default-100 hover:bg-default-200",
-            next: "w-10 h-10 bg-default-100 hover:bg-default-200",
+              "w-10 h-10 text-sm font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white shadow-md shadow-fuchsia-500/40",
+            prev: "w-10 h-10 bg-default-100/40 backdrop-blur-md hover:bg-default-200/50",
+            next: "w-10 h-10 bg-default-100/40 backdrop-blur-md hover:bg-default-200/50",
           }}
           page={currentPage}
           total={totalPages}

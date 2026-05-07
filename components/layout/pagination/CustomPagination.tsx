@@ -32,10 +32,11 @@ export default function CustomPagination({ resPerPage, filteredCount }: Props) {
       radius="lg"
       classNames={{
         wrapper: "gap-2",
-        item: "w-10 h-10 text-sm font-medium bg-default-100 hover:bg-default-200",
-        cursor: "w-10 h-10 text-sm font-bold bg-primary text-white shadow-md shadow-primary/40",
-        prev: "w-10 h-10 bg-default-100 hover:bg-default-200",
-        next: "w-10 h-10 bg-default-100 hover:bg-default-200",
+        item: "w-10 h-10 text-sm font-medium bg-default-100/40 backdrop-blur-md hover:bg-default-200/50 transition-colors",
+        cursor:
+          "w-10 h-10 text-sm font-bold bg-gradient-to-r from-fuchsia-500 to-cyan-500 text-white shadow-md shadow-fuchsia-500/40",
+        prev: "w-10 h-10 bg-default-100/40 backdrop-blur-md hover:bg-default-200/50 transition-colors",
+        next: "w-10 h-10 bg-default-100/40 backdrop-blur-md hover:bg-default-200/50 transition-colors",
       }}
       page={currentPage}
       total={totalPages}

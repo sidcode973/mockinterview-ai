@@ -16,6 +16,11 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { createNewSubscription } from "@/actions/payment-action";
 import toast from "react-hot-toast";
+import { m } from "framer-motion";
+import AuroraBackground from "@/components/visual/AuroraBackground";
+import ParticleField from "@/components/visual/ParticleField";
+import GlassCard from "@/components/ui/GlassCard";
+import MagneticButton from "@/components/ui/MagneticButton";
 
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_KEY;
 
@@ -34,15 +39,13 @@ const Subscribe = () => {
   if (!stripePromise) {
     return (
       <div className="flex h-full w-full items-center justify-center p-8">
-        <div className="max-w-md rounded-xl border border-danger-200 bg-danger-50 p-6 text-center">
-          <p className="font-semibold text-danger-700">
-            Payment unavailable
-          </p>
-          <p className="mt-2 text-sm text-danger-600">
+        <GlassCard variant="strong" className="max-w-md p-6 text-center border border-danger-200/40">
+          <p className="font-semibold text-danger">Payment unavailable</p>
+          <p className="mt-2 text-sm text-default-500">
             Stripe is not configured. Check your <code>NEXT_PUBLIC_STRIPE_KEY</code>
             {" "}in <code>.env.local</code> and restart the dev server.
           </p>
-        </div>
+        </GlassCard>
       </div>
     );
   }
@@ -61,7 +64,6 @@ const CheckoutForm = () => {
   const elements = useElements();
   const router = useRouter();
 
-  // Derive email directly from session — no mirror state, no useEffect
   const email = data?.user?.email ?? "";
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -84,9 +86,7 @@ const CheckoutForm = () => {
       const { paymentMethod, error } = await stripe.createPaymentMethod({
         type: "card",
         card: cardElements!,
-        billing_details: {
-          email,
-        },
+        billing_details: { email },
       });
 
       if (error) {
@@ -123,43 +123,57 @@ const CheckoutForm = () => {
   };
 
   return (
-    <div className="flex h-full w-full items-center justify-center">
-      <div className="flex w-full max-w-sm flex-col gap-4 rounded-large">
-        <div className="flex flex-col items-center pb-6">
-          <Logo />
-          <p className="text-xl font-medium">Subscribe</p>
-          <p className="text-small text-default-500">
-            Enter your email and card details to subscribe
-          </p>
-        </div>
+    <div className="relative flex min-h-[80vh] w-full items-center justify-center py-10">
+      <AuroraBackground variant="auth" className="!fixed" />
+      <ParticleField density="low" />
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <RadioGroup isDisabled label="Your Plan" defaultValue={"9.99"}>
-            <Radio value="9.99">$9.99 per month</Radio>
-          </RadioGroup>
-
-          <Input
-            type="email"
-            label="Email Address"
-            placeholder="Email"
-            variant="bordered"
-            value={email}
-            isDisabled
-          />
-          <div className="my-4">
-            <CardElement options={{ hidePostalCode: true }} />
+      <m.div
+        initial={{ opacity: 0, y: 16, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-10 flex w-full max-w-md flex-col gap-4"
+      >
+        <GlassCard variant="strong" glow className="px-8 pb-8 pt-7">
+          <div className="flex flex-col items-center pb-6">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#FF1CF7] via-[#b249f8] to-[#22d3ee] shadow-lg shadow-fuchsia-500/40 mb-3">
+              <Logo />
+            </div>
+            <p className="text-xl font-semibold tracking-tight">Subscribe</p>
+            <p className="text-small text-default-500 mt-1">
+              Enter your email and card details to subscribe
+            </p>
           </div>
-          <Button
-            className="w-full"
-            color="primary"
-            type="submit"
-            startContent={<Icon icon="solar:card-send-bold" fontSize={19} />}
-            isDisabled={!stripe || loading}
-          >
-            {loading ? "Processing..." : "Subscribe"}
-          </Button>
-        </form>
-      </div>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <RadioGroup isDisabled label="Your Plan" defaultValue={"9.99"}>
+              <Radio value="9.99">$9.99 per month</Radio>
+            </RadioGroup>
+
+            <Input
+              type="email"
+              label="Email Address"
+              placeholder="Email"
+              variant="bordered"
+              value={email}
+              isDisabled
+            />
+            <div className="rounded-xl border border-default-200/60 bg-default-50/40 px-4 py-3">
+              <CardElement options={{ hidePostalCode: true }} />
+            </div>
+            <MagneticButton strength={0.25} className="w-full block">
+              <Button
+                className="w-full bg-gradient-to-r from-[#FF1CF7] via-[#b249f8] to-[#22d3ee] animate-gradient-pan text-white font-semibold shadow-lg shadow-fuchsia-500/30"
+                type="submit"
+                startContent={!loading && <Icon icon="solar:card-send-bold" fontSize={19} />}
+                isDisabled={!stripe || loading}
+                isLoading={loading}
+              >
+                {loading ? "Processing..." : "Subscribe"}
+              </Button>
+            </MagneticButton>
+          </form>
+        </GlassCard>
+      </m.div>
     </div>
   );
 };
