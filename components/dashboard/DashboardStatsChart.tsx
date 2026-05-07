@@ -172,9 +172,9 @@ export default function DashboardStatsChart({ stats }: Props) {
   }, [stats]);
 
   return (
-    <div className="rounded-2xl border border-default-200/60 bg-content1 shadow-sm overflow-hidden">
+    <div className="glass rounded-2xl shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="flex items-start justify-between px-6 pt-5 pb-3 border-b border-default-100">
+      <div className="flex items-start justify-between px-6 pt-5 pb-3 border-b border-default-200/40">
         <div>
           <h3 className="text-base font-semibold text-default-800 tracking-tight">
             Interview Activity

@@ -24,6 +24,8 @@ import { cancelUserSubscription } from "@/actions/payment-action";
 import { isUserSubscribed } from "@/helpers/auth";
 import { deleteUser } from "@/actions/auth-actions";
 import UpdateUser from "./UpdateUser";
+import GlassCard from "@/components/ui/GlassCard";
+import MotionFadeIn from "@/components/ui/motion/MotionFadeIn";
 
 export const columns = [
   { name: "USER", uid: "user" },
@@ -67,7 +69,6 @@ const ListUsers = ({ data }: Props) => {
 
     if ("deleted" in res && res.deleted) {
       toast.success("User deleted successfully");
-
       router.push("/admin/users");
     }
   };
@@ -79,7 +80,7 @@ const ListUsers = ({ data }: Props) => {
       case "user":
         return (
           <div className="flex flex-col">
-            <p className="text-bold text-sm ">{user?.name}</p>
+            <p className="text-bold text-sm">{user?.name}</p>
             <p className="text-bold text-sm text-default-400">{user?.email}</p>
           </div>
         );
@@ -168,27 +169,33 @@ const ListUsers = ({ data }: Props) => {
           <SelectItem key={"past_due"}>Past Due</SelectItem>
         </Select>
       </div>
-      <Table aria-label="Interivews table">
-        <TableHeader columns={columns}>
-          {(column) => (
-            <TableColumn
-              key={column.uid}
-              align={column.uid === "actions" ? "center" : "start"}
-            >
-              {column.name}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody items={users}>
-          {(item: IUser) => (
-            <TableRow key={item._id.toString()}>
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
+
+      <MotionFadeIn>
+        <GlassCard variant="soft" className="overflow-hidden">
+          <Table aria-label="Users table" removeWrapper>
+            <TableHeader columns={columns}>
+              {(column) => (
+                <TableColumn
+                  key={column.uid}
+                  align={column.uid === "actions" ? "center" : "start"}
+                  className="text-xs font-semibold text-default-500 uppercase tracking-wider bg-default-100/30"
+                >
+                  {column.name}
+                </TableColumn>
               )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            </TableHeader>
+            <TableBody items={users}>
+              {(item: IUser) => (
+                <TableRow key={item._id.toString()}>
+                  {(columnKey) => (
+                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </GlassCard>
+      </MotionFadeIn>
 
       <div className="flex justify-center items-center mt-10">
         <CustomPagination

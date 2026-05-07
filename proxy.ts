@@ -4,7 +4,7 @@ import { isUserAdmin, isUserSubscribed } from "./helpers/auth";
 import { NextResponse } from "next/server";
 
 export default withAuth(
-  function middleware(req) {
+  function proxy(req) {
     const url = req?.nextUrl?.pathname;
     const user = req?.nextauth?.token?.user as IUser;
 

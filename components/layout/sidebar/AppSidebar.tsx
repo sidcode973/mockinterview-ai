@@ -44,15 +44,20 @@ const AppSiderbar = () => {
 
   return (
     <div className="h-full p-2">
-      <div className="h-full rounded-xl border border-default-200/60 dark:border-default-100/20 bg-gradient-to-b from-content1 to-content1/80 shadow-lg overflow-hidden backdrop-blur-sm">
-        {/* Top accent bar */}
-        <div className="h-0.5 w-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 rounded-t-xl" />
+      <div className="relative h-full rounded-2xl glass shadow-xl overflow-hidden">
+        <div
+          className="absolute -top-px left-0 right-0 h-px"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, rgba(178,73,248,0.7), rgba(34,211,238,0.7), rgba(255,28,247,0.7), transparent)",
+          }}
+        />
 
         <Listbox
           aria-label="User Menu"
           className="py-3 gap-0 bg-transparent h-full"
           itemClasses={{
-            base: "px-3 rounded-lg mx-1 h-11 data-[hover=true]:bg-default-100/70 transition-colors duration-150",
+            base: "px-3 rounded-lg mx-1 h-11 data-[hover=true]:bg-default-100/50 transition-all duration-200",
           }}
           selectedKeys={[selectedKey]}
           onAction={handleAction}
@@ -63,8 +68,7 @@ const AppSiderbar = () => {
             textValue="New Interview"
             startContent={
               <Button
-                className="bg-foreground font-medium text-background w-full"
-                color="secondary"
+                className="w-full bg-gradient-to-r from-fuchsia-500 via-violet-500 to-cyan-500 animate-gradient-pan font-medium text-white shadow-md shadow-fuchsia-500/30"
                 endContent={<Icon icon="ep:circle-plus-filled" />}
                 variant="flat"
                 as={Link}
@@ -80,14 +84,14 @@ const AppSiderbar = () => {
                 key={page.path}
                 className={`gap-3 ${
                   selectedKey?.toString()?.includes(page.path)
-                    ? "bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border-l-2 border-violet-500 !rounded-l-none font-semibold"
+                    ? "bg-gradient-to-r from-fuchsia-500/15 via-violet-500/10 to-cyan-500/10 border-l-2 border-fuchsia-500 !rounded-l-none font-semibold"
                     : ""
                 }`}
                 startContent={
                   <IconWrapper
                     className={`bg-${
                       getPageIconAndPath(page.path).color
-                    }/10 text-${getPageIconAndPath(page.path).color}`}
+                    }/15 text-${getPageIconAndPath(page.path).color}`}
                   >
                     <Icon
                       icon={getPageIconAndPath(page.path)?.icon}

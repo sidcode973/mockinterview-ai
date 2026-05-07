@@ -8,9 +8,11 @@ import {
   Cell,
   PolarAngleAxis,
 } from "recharts";
-import { Card, cn } from "@heroui/react";
+import { cn } from "@heroui/react";
 import { IInterview } from "@/backend/models/interview-model";
 import { calculateAverageScore, calculateDuration } from "@/helpers/interview";
+import GlassCard from "../ui/GlassCard";
+import { MotionStagger, MotionStaggerItem } from "../ui/motion";
 
 interface CircleChartProps {
   title: string;
@@ -25,7 +27,6 @@ interface CircleChartProps {
 }
 
 export default function ResultTable({ interview }: { interview: IInterview }) {
-
   const averageScore = calculateAverageScore(interview?.questions);
 
   const durationData = calculateDuration(
@@ -94,17 +95,18 @@ export default function ResultTable({ interview }: { interview: IInterview }) {
   ];
 
   return (
-    <div className="grid w-full grid-cols-1 gap-5  md:grid-cols-3 lg:grid-cols-4 mt-5">
+    <MotionStagger className="grid w-full grid-cols-1 gap-5 md:grid-cols-3 lg:grid-cols-4 mt-5">
       {data.map((item, index) => (
-        <CircleChartCard key={index} {...item} />
+        <MotionStaggerItem key={index}>
+          <CircleChartCard {...item} />
+        </MotionStaggerItem>
       ))}
-    </div>
+    </MotionStagger>
   );
 }
 
-const formatTotal = (value: number | undefined) => {
-  return value?.toLocaleString() ?? "0";
-};
+const formatTotal = (value: number | undefined) =>
+  value?.toLocaleString() ?? "0";
 
 const CircleChartCard: React.FC<CircleChartProps> = ({
   title,
@@ -112,15 +114,12 @@ const CircleChartCard: React.FC<CircleChartProps> = ({
   chartData,
   total,
   strValue,
-  ...props
 }) => {
   return (
-    <Card
+    <GlassCard
       aria-label={title}
-      className={cn(
-        "h-55 border border-transparent dark:border-default-100"
-      )}
-      {...props}
+      variant="soft"
+      className={cn("h-55 transition-shadow hover:ring-glow")}
     >
       <div className="flex min-h-[176px] w-full flex-1 gap-x-3">
         <ResponsiveContainer
@@ -146,7 +145,7 @@ const CircleChartCard: React.FC<CircleChartProps> = ({
             />
             <RadialBar
               angleAxisId={0}
-              animationDuration={1000}
+              animationDuration={1400}
               animationEasing="ease"
               background={{
                 fill: "hsl(var(--heroui-default-100))",
@@ -170,7 +169,7 @@ const CircleChartCard: React.FC<CircleChartProps> = ({
                   dy="-0.5em"
                   x="50%"
                 >
-                  {chartData?.[0].name}
+                  {chartData?.[0]?.name ?? title}
                 </tspan>
                 <tspan
                   className="fill-foreground text-medium font-semibold"
@@ -184,6 +183,6 @@ const CircleChartCard: React.FC<CircleChartProps> = ({
           </RadialBarChart>
         </ResponsiveContainer>
       </div>
-    </Card>
+    </GlassCard>
   );
 };

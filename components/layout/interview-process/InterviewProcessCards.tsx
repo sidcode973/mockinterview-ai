@@ -3,14 +3,14 @@
 import React from "react";
 import { Icon } from "@iconify/react";
 import FeatureCard from "./FeatureCard";
-
-
+import { MotionStagger, MotionStaggerItem } from "@/components/ui/motion";
+import MotionFadeIn from "@/components/ui/motion/MotionFadeIn";
 
 const featuresCategories = [
   {
     key: "generate",
     title: "Generate Questions",
-    icon: <Icon icon="solar:mask-happly-linear" width={40} />,
+    icon: <Icon icon="solar:mask-happly-linear" width={32} />,
     descriptions: [
       "Create tailored interview questions based on your field of expertise.",
       "Cover a wide range of topics to ensure comprehensive preparation.",
@@ -20,7 +20,7 @@ const featuresCategories = [
   {
     key: "provide",
     title: "Answer Assistance",
-    icon: <Icon icon="solar:magic-stick-3-linear" width={40} />,
+    icon: <Icon icon="solar:magic-stick-3-linear" width={32} />,
     descriptions: [
       "Get AI-powered suggestions to craft impactful answers.",
       "Practice with model answers to refine your responses.",
@@ -30,7 +30,7 @@ const featuresCategories = [
   {
     key: "analyze",
     title: "Analyze and Improve",
-    icon: <Icon icon="solar:shield-warning-outline" width={40} />,
+    icon: <Icon icon="solar:shield-warning-outline" width={32} />,
     descriptions: [
       "Receive detailed feedback on your performance.",
       "Identify strengths and areas for improvement.",
@@ -41,22 +41,24 @@ const featuresCategories = [
 
 export default function InterviewProcessCards() {
   return (
-    <div className="my-10">
-      <div className="text-center">
-        <span className="tracking-tight inline font-semibold bg-clip-text text-transparent bg-gradient-to-b from-[#FF1CF7] to-[#b249f8] text-[2.3rem] lg:text-5xl leading-9">
+    <div className="my-16 w-full">
+      <MotionFadeIn className="text-center">
+        <span className="tracking-tight inline font-semibold text-gradient-fusion text-[2.3rem] lg:text-5xl leading-9">
           Trusted Process
         </span>
-      </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 my-10">
+      </MotionFadeIn>
+
+      <MotionStagger className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 my-10">
         {featuresCategories.map((category) => (
-          <FeatureCard
-            key={category.key}
-            descriptions={category.descriptions}
-            icon={category.icon}
-            title={category.title}
-          />
+          <MotionStaggerItem key={category.key}>
+            <FeatureCard
+              descriptions={category.descriptions}
+              icon={category.icon}
+              title={category.title}
+            />
+          </MotionStaggerItem>
         ))}
-      </div>
+      </MotionStagger>
     </div>
   );
 }

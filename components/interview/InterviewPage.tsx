@@ -6,7 +6,6 @@ import { Icon } from "@iconify/react";
 import { IInterview, IQuestion } from "@/backend/models/interview-model";
 import { formatTime } from "@/helpers/helper";
 
-
 import {
   getAnswerFromLocalStorage,
   getAnswersFromLocalStorage,
@@ -17,9 +16,10 @@ import toast from "react-hot-toast";
 import { updateInteview } from "@/actions/interview-actions";
 import { useRouter } from "next/navigation";
 import PromptInputWithBottomActions from "./PromptInputWithBottomActions";
+import GlassCard from "../ui/GlassCard";
+import { m, AnimatePresence } from "framer-motion";
 
 export default function InterviewPage({ interview }: { interview: IInterview }) {
-
   const initialQuestionIndex = getFirstIncompleteQuestionIndex(
     interview?.questions
   );
@@ -45,7 +45,6 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
   }, [timeLeft]);
 
   useEffect(() => {
-    // Load answers from local storage
     const storedAnswers = getAnswersFromLocalStorage(interview?._id?.toString());
 
     if (storedAnswers) {
@@ -189,7 +188,7 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
   };
 
   return (
-    <div className="flex h-full w-full max-w-full flex-col gap-8">
+    <div className="flex h-full w-full max-w-full flex-col gap-6">
       {showAlert && (
         <Alert
           color="danger"
@@ -198,16 +197,20 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
         />
       )}
 
-      <Progress
-        aria-label="Interview Progress"
-        className="w-full"
-        color="default"
-        label={`Question ${currentQuestionIndex + 1} of ${
-          interview?.numOfQuestions
-        }`}
-        size="md"
-        value={((currentQuestionIndex + 1) / interview?.numOfQuestions) * 100}
-      />
+      <GlassCard variant="soft" className="p-4">
+        <Progress
+          aria-label="Interview Progress"
+          className="w-full"
+          color="secondary"
+          classNames={{
+            indicator: "bg-gradient-to-r from-fuchsia-500 to-cyan-500",
+          }}
+          label={`Question ${currentQuestionIndex + 1} of ${interview?.numOfQuestions}`}
+          size="md"
+          value={((currentQuestionIndex + 1) / interview?.numOfQuestions) * 100}
+        />
+      </GlassCard>
+
       <div className="flex flex-wrap gap-1.5">
         {interview?.questions?.map((question: IQuestion, index: number) => (
           <Chip
@@ -215,7 +218,9 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
             color={answers[question?._id?.toString()] ? "success" : "default"}
             size="sm"
             variant="flat"
-            className="font-bold cursor-pointer text-sm radius-full"
+            className={`font-bold cursor-pointer text-sm transition-transform hover:scale-110 ${
+              index === currentQuestionIndex ? "ring-2 ring-fuchsia-500/50" : ""
+            }`}
             onClick={() => {
               setCurrentQuestionIndex(index);
               setAnswer(
@@ -227,10 +232,13 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
           </Chip>
         ))}
       </div>
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-5">
-        <span className="text-lg font-semibold text-right mb-2 sm:mb-0">
-          Duration Left: {formatTime(timeLeft)}
-        </span>
+
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-sm font-semibold">
+          <Icon icon="solar:clock-circle-bold" className="text-fuchsia-500" />
+          Duration Left:{" "}
+          <span className="text-gradient-cyan tabular-nums">{formatTime(timeLeft)}</span>
+        </div>
         <Button
           color="danger"
           startContent={<Icon icon="solar:exit-outline" fontSize={18} />}
@@ -243,13 +251,23 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
         </Button>
       </div>
 
-      <span className="text-center h-40">
-        <span
-          className={`tracking-tight inline font-semibold bg-clip-text text-transparent bg-linear-to-b from-[#FF1CF7] to-[#b249f8] text-[1.4rem] lg:text-2.5xl flex items-center justify-center h-full`}
+      <AnimatePresence mode="wait">
+        <m.div
+          key={currentQuestionIndex}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         >
-          {currentQuestion?.question}
-        </span>
-      </span>
+          <GlassCard variant="strong" className="px-6 py-10 text-center">
+            <span
+              className={`tracking-tight inline font-semibold text-gradient-fusion text-[1.4rem] lg:text-2.5xl flex items-center justify-center min-h-[120px]`}
+            >
+              {currentQuestion?.question}
+            </span>
+          </GlassCard>
+        </m.div>
+      </AnimatePresence>
 
       <PromptInputWithBottomActions
         key={currentQuestionIndex}
@@ -257,7 +275,7 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
         onChange={handleAnswerChange}
       />
 
-      <div className="flex justify-between items-center mt-5">
+      <div className="flex justify-between items-center">
         <Button
           className="bg-foreground px-4.5 py-2 font-medium text-background"
           radius="full"
@@ -297,10 +315,9 @@ export default function InterviewPage({ interview }: { interview: IInterview }) 
         </Button>
 
         <Button
-          className="bg-foreground px-4.5 py-2 font-medium text-background"
+          className="bg-gradient-to-r from-fuchsia-500 to-cyan-500 px-4.5 py-2 font-medium text-white shadow-md shadow-fuchsia-500/20"
           radius="full"
-          color="secondary"
-          variant="flat"
+          variant="solid"
           endContent={
             <Icon
               className="flex-none outline-none [&>path]:stroke-2"

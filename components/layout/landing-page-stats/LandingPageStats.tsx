@@ -1,11 +1,10 @@
 "use client";
 
-import type {ButtonProps, CardProps} from "@heroui/react";
+import type { ButtonProps, CardProps } from "@heroui/react";
 
 import React from "react";
-import {ResponsiveContainer, RadialBarChart, RadialBar, Cell, PolarAngleAxis} from "recharts";
+import { ResponsiveContainer, RadialBarChart, RadialBar, Cell, PolarAngleAxis } from "recharts";
 import {
-  Card,
   Button,
   Dropdown,
   DropdownItem,
@@ -13,7 +12,9 @@ import {
   DropdownTrigger,
   cn,
 } from "@heroui/react";
-import {Icon} from "@iconify/react";
+import { Icon } from "@iconify/react";
+import GlassCard from "@/components/ui/GlassCard";
+import { MotionStagger, MotionStaggerItem } from "@/components/ui/motion";
 
 type ChartData = {
   name: string;
@@ -29,7 +30,7 @@ type CircleChartProps = {
 };
 
 const data: CircleChartProps[] = [
-     {
+  {
     title: "Activity",
     color: "default",
     total: 10000,
@@ -77,11 +78,13 @@ const data: CircleChartProps[] = [
 
 export default function Component() {
   return (
-    <dl className="grid w-full grid-cols-1 gap-5 md:grid-cols-2  lg:grid-cols-4">
+    <MotionStagger className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
       {data.map((item, index) => (
-        <CircleChartCard key={index} {...item} />
+        <MotionStaggerItem key={index} className="h-full">
+          <CircleChartCard {...item} />
+        </MotionStaggerItem>
       ))}
-    </dl>
+    </MotionStagger>
   );
 }
 
@@ -92,15 +95,12 @@ const formatTotal = (value: number | undefined) => {
 const CircleChartCard = React.forwardRef<
   HTMLDivElement,
   Omit<CardProps, "children"> & CircleChartProps
->(({className, title, color, chartData, total, ...props}, ref) => {
+>(({ className, title, color, chartData, total }, ref) => {
   return (
-    <Card
-      ref={ref}
-      className={cn(
-        "flex h-[240px] flex-col border border-transparent dark:border-default-100",
-        className
-      )}
-      {...props}
+    <GlassCard
+      variant="soft"
+      ref={ref as React.Ref<HTMLDivElement>}
+      className={cn("flex h-[240px] flex-col transition-shadow hover:ring-glow", className)}
     >
       <div className="flex flex-col gap-y-2 p-4 pb-0">
         <div className="flex items-center justify-between gap-x-2">
@@ -152,7 +152,7 @@ const CircleChartCard = React.forwardRef<
             <PolarAngleAxis angleAxisId={0} domain={[0, total]} tick={false} type="number" />
             <RadialBar
               angleAxisId={0}
-              animationDuration={1000}
+              animationDuration={1400}
               animationEasing="ease"
               background={{
                 fill: "hsl(var(--heroui-default-100))",
@@ -180,7 +180,7 @@ const CircleChartCard = React.forwardRef<
           </RadialBarChart>
         </ResponsiveContainer>
       </div>
-    </Card>
+    </GlassCard>
   );
 });
 
